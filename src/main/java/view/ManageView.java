@@ -1,6 +1,10 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -80,6 +84,25 @@ class ImportQuizFrame extends JFrame {
 
         JLabel numLabel = new JLabel("Number of Questions:");
         JTextField numField = new JTextField("10");
+
+        // 🔒 Limit numField to numbers only
+        ((AbstractDocument) numField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (string.matches("\\d+")) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                if (text.matches("\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
 
         JLabel categoryLabel = new JLabel("Category:");
         JComboBox<String> categoryBox = new JComboBox<>(new String[]{"Any", "Science", "History", "Film"});
