@@ -33,13 +33,13 @@ public class HomeView extends JPanel {
 
 
         userButton = createButton(
-                "I am user",
+                "I am a user",
                 new Color(60, 117, 213),
                 Color.WHITE,
                 new Color(112, 188, 41));
 
         creatorButton = createButton(
-                "I am creator",
+                "I am a creator",
                 new Color(136, 86, 234),
                 Color.WHITE,
                 new Color(236, 197, 76));
