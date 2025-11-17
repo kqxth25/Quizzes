@@ -12,7 +12,9 @@ public class Main {
                         .addLoginView()
                         .addSignupView()
                         .addSelectQuizView()
+                        .addCreatorLoginView()
                         .addSelectQuizUseCase()
+                        .addCreatorLoginUseCase()
                         .addSignupUseCase()
                         .addLoginUseCase()
                         .build();
