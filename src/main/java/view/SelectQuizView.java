@@ -1,4 +1,113 @@
 package view;
 
-public class SelectQuizView {
+import interface_adapter.ViewManagerModel;
+import interface_adapter.selectquiz.ListQuizzesController;
+import interface_adapter.selectquiz.SelectQuizViewModel;
+import use_case.selectquiz.QuizItemDto;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+
+public class SelectQuizView extends JPanel implements ActionListener {
+
+    private final String viewName = "select quiz";
+    private final SelectQuizViewModel viewModel;
+    private final ViewManagerModel nav;
+
+    private ListQuizzesController controller;
+
+    private final JPanel quizListPanel = new JPanel();
+    private final JButton backButton = new JButton("Back to Home");
+    private final JButton historyButton = new JButton("View History");
+    private final JLabel statusLabel = new JLabel("");
+
+    public SelectQuizView(final SelectQuizViewModel viewModel,
+                          final ViewManagerModel nav) {
+        this.viewModel = viewModel;
+        this.nav = nav;
+
+        setLayout(new BorderLayout(10, 10));
+
+        quizListPanel.setLayout(new BoxLayout(quizListPanel, BoxLayout.Y_AXIS));
+        JScrollPane scrollPane = new JScrollPane(quizListPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        add(scrollPane, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        bottomPanel.add(backButton);
+        bottomPanel.add(historyButton);
+
+        JPanel southContainer = new JPanel(new BorderLayout());
+        southContainer.add(bottomPanel, BorderLayout.CENTER);
+        southContainer.add(statusLabel, BorderLayout.SOUTH);
+        add(southContainer, BorderLayout.SOUTH);
+
+        backButton.addActionListener(this);
+        historyButton.addActionListener(this);
+    }
+
+    public void setController(ListQuizzesController controller) {
+        this.controller = controller;
+        if (this.controller != null) {
+            this.controller.execute();
+        }
+    }
+
+    public void updateFromViewModel() {
+        List<QuizItemDto> quizzes = viewModel.getQuizzes();
+        quizListPanel.removeAll();
+
+        if (quizzes == null || quizzes.isEmpty()) {
+            JLabel empty = new JLabel("No quizzes available.");
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            quizListPanel.add(empty);
+            statusLabel.setText("");
+        }
+        else {
+            for (QuizItemDto q : quizzes) {
+                final QuizItemDto item = q;
+                JButton quizButton = new JButton(item.getTitle() + " (" + item.getDifficulty() + ")");
+                quizButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                quizButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        onQuizSelected(item);
+                    }
+                });
+                quizListPanel.add(Box.createVerticalStrut(8));
+                quizListPanel.add(quizButton);
+            }
+            statusLabel.setText("Select a quiz to start.");
+        }
+
+        quizListPanel.revalidate();
+        quizListPanel.repaint();
+    }
+
+    private void onQuizSelected(QuizItemDto quiz) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Selected quiz: " + quiz.getTitle() + "\nDifficulty: " + quiz.getDifficulty(),
+                "Quiz Selected",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+        if (src == backButton) {
+            nav.navigate("home");
+        } else if (src == historyButton) {
+            nav.navigate("history");
+        }
+    }
+
+    public String getViewName() {
+        return this.viewName;
+    }
 }
