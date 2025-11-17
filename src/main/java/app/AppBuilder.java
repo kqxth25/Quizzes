@@ -28,6 +28,11 @@ import view.HomeView;
 import view.LoginView;
 import view.SignupView;
 import view.SelectQuizView;
+import interface_adapter.creator_login.CreatorLoginController;
+import interface_adapter.creator_login.CreatorLoginPresenter;
+import interface_adapter.creator_login.CreatorLoginViewModel;
+import use_case.creator_login.*;
+import view.CreatorLoginView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,8 +54,11 @@ public class AppBuilder {
     private LoginView loginView;
     private SignupView signupView;
     private SelectQuizView selectQuizView;
+    private CreatorLoginView creatorLoginView;
+    private CreatorLoginViewModel creatorLoginViewModel;
 
     private final ViewManager viewManager;
+
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
@@ -60,6 +68,13 @@ public class AppBuilder {
     public AppBuilder addHomeView() {
         this.homeView = new HomeView(this.viewManagerModel);
         this.cardPanel.add(this.homeView, this.homeView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addCreatorLoginView() {
+        this.creatorLoginViewModel = new CreatorLoginViewModel();
+        this.creatorLoginView = new CreatorLoginView();
+        this.cardPanel.add(this.creatorLoginView, this.creatorLoginView.getViewName());
         return this;
     }
 
@@ -107,6 +122,21 @@ public class AppBuilder {
         ListQuizzesInputBoundary interactor = new ListQuizzesInteractor(this.quizDao, presenter);
         ListQuizzesController controller = new ListQuizzesController(interactor);
         this.selectQuizView.setController(controller);
+        return this;
+    }
+
+    public AppBuilder addCreatorLoginUseCase() {
+        CreatorLoginOutputBoundary presenter =
+                new CreatorLoginPresenter(this.viewManagerModel);
+
+        CreatorLoginInputBoundary interactor =
+                new CreatorLoginInteractor(presenter);
+
+        CreatorLoginController controller =
+                new CreatorLoginController(interactor);
+
+        this.creatorLoginView.setController(controller);
+
         return this;
     }
 
