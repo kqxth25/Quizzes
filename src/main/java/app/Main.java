@@ -12,13 +12,14 @@ public class Main {
                         .addLoginView()
                         .addSignupView()
                         .addSelectQuizView()
+                        .addQuizView()
+                        .addQuizUseCase()
                         .addCreatorLoginView()
                         .addSelectQuizUseCase()
                         .addCreatorLoginUseCase()
                         .addSignupUseCase()
                         .addLoginUseCase()
                         .build();
-
                 app.setVisible(true);
             }
         });

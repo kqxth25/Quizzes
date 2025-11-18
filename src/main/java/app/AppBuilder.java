@@ -33,6 +33,16 @@ import interface_adapter.creator_login.CreatorLoginPresenter;
 import interface_adapter.creator_login.CreatorLoginViewModel;
 import use_case.creator_login.*;
 import view.CreatorLoginView;
+import view.QuizView;
+import interface_adapter.quiz.QuizController;
+import interface_adapter.quiz.QuizPresenter;
+import interface_adapter.quiz.QuizViewModel;
+import interface_adapter.quiz.QuizState;
+import use_case.quiz.LocalQuizRepository;
+import use_case.quiz.QuizRepository;
+import use_case.quiz.SubmitAnswerInteractor;
+import use_case.quiz.SubmitAnswerInputBoundary;
+import use_case.quiz.SubmitAnswerOutputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -139,7 +149,36 @@ public class AppBuilder {
 
         return this;
     }
+    private QuizView quizView;
+    private QuizViewModel quizViewModel;
 
+    public AppBuilder addQuizView() {
+        this.quizViewModel = new QuizViewModel(new QuizState(2));
+        this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
+        this.cardPanel.add(this.quizView, this.quizView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addQuizUseCase() {
+
+        String[][] questions = {
+                {"What is 2 + 2?"},
+                {"What is 3 + 5?"}
+        };
+        String[][] options = {
+                {"1", "2", "3", "4"},
+                {"5", "6", "7", "8"}
+        };
+
+        QuizRepository repository = new LocalQuizRepository(questions, options);
+        QuizPresenter presenter = new QuizPresenter(this.quizViewModel);
+        SubmitAnswerInputBoundary interactor = new SubmitAnswerInteractor(presenter, repository);
+        QuizController controller = new QuizController(interactor);
+
+        this.quizView.setController(controller);
+
+        return this;
+    }
     public AppBuilder addSelectQuizUseCase(ListQuizzesDataAccessInterface externalQuizDao) {
         this.quizDao = externalQuizDao;
         return addSelectQuizUseCase();
