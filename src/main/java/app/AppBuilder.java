@@ -155,7 +155,7 @@ public class AppBuilder {
     public AppBuilder addQuizView() {
         this.quizViewModel = new QuizViewModel(new QuizState(2));
         this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
-        this.cardPanel.add(this.quizView, this.quizView.getViewName());
+        this.cardPanel.add(this.quizView, "hh");
         return this;
     }
 

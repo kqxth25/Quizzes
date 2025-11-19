@@ -24,7 +24,7 @@ public class MainQuizTest {
             };
             QuizRepository repo = new LocalQuizRepository(questions, options);
 
-    s
+
             QuizState state = new QuizState(questions.length);
             QuizViewModel viewModel = new QuizViewModel(state);
 
