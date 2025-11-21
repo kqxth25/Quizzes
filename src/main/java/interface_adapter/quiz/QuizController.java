@@ -14,4 +14,14 @@ public class QuizController {
         SubmitAnswerInputData inputData = new SubmitAnswerInputData(questionIndex, selectedOption);
         submitAnswerUseCase.submitAnswer(inputData);
     }
+
+    public void next(int currentIndex, int selectedOption) {
+        SubmitAnswerInputData inputData = new SubmitAnswerInputData(currentIndex, selectedOption);
+        submitAnswerUseCase.next(inputData);
+    }
+
+    public void previous(int currentIndex, int selectedOption) {
+        SubmitAnswerInputData inputData = new SubmitAnswerInputData(currentIndex, selectedOption);
+        submitAnswerUseCase.previous(inputData);
+    }
 }

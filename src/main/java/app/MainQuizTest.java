@@ -1,56 +1,76 @@
 package app;
 
-import javax.swing.*;
-import view.QuizView;
 import interface_adapter.quiz.QuizController;
 import interface_adapter.quiz.QuizPresenter;
-import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.quiz.QuizState;
-import use_case.quiz.*;
+import interface_adapter.quiz.QuizViewModel;
+import use_case.quiz.LocalQuizRepository;
+import use_case.quiz.QuizRepository;
+import use_case.quiz.SubmitAnswerInteractor;
+import use_case.quiz.SubmitAnswerOutputData;
+import view.QuizView;
+
+import javax.swing.*;
 
 public class MainQuizTest {
+
     public static void main(String[] args) {
+        JFrame application = new JFrame("Quiz Test");
+        application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        SwingUtilities.invokeLater(() -> {
+        String[][] questions = {
+                {"1. What is the capital of France?"},
+                {"2. Which planet is known as the Red Planet?"},
+                {"3. What is the largest mammal in the world?"},
+                {"4. Who wrote 'Romeo and Juliet'?"},
+                {"5. The chemical symbol for water is H2O."},
+                {"6. How many continents are there?"},
+                {"7. The square root of 81 is 9."},
+                {"8. In which country are the Pyramids of Giza located?"},
+                {"9. What is the main ingredient in guacamole?"},
+                {"10. Who painted the Mona Lisa?"}
+        };
 
+        String[][] options = {
+                {"Paris", "London", "Berlin", "Madrid"},
+                {"Earth", "Mars", "Jupiter", "Venus"},
+                {"Elephant", "Blue Whale", "Giraffe", "Great White Shark"},
+                {"Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"},
+                {"True", "False"},
+                {"5", "6", "7", "8"},
+                {"True", "False"},
+                {"Greece", "Mexico", "Egypt", "Italy"},
+                {"Tomato", "Avocado", "Onion", "Lime"},
+                {"Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"}
+        };
 
-            String[][] questions = {
-                    {"What is 2+2?"},
-                    {"What is 3+3?"}
-            };
-            String[][] options = {
-                    {"1","2","3","4"},
-                    {"4","5","6","7"}
-            };
-            QuizRepository repo = new LocalQuizRepository(questions, options);
+        int[] correctAnswers = {0, 1, 1, 1, 0, 2, 0, 2, 1, 2};
 
+        QuizRepository quizRepository = new LocalQuizRepository(questions, options, correctAnswers);
 
-            QuizState state = new QuizState(questions.length);
-            QuizViewModel viewModel = new QuizViewModel(state);
+        int totalQuestions = quizRepository.getQuestions().length;
+        QuizState quizState = new QuizState(totalQuestions);
+        QuizViewModel quizViewModel = new QuizViewModel(quizState);
 
+        QuizPresenter quizPresenter = new QuizPresenter(quizViewModel);
+        SubmitAnswerInteractor submitAnswerInteractor = new SubmitAnswerInteractor(quizPresenter, quizRepository);
 
-            QuizView quizView = new QuizView(viewModel, null);
+        QuizController quizController = new QuizController(submitAnswerInteractor);
 
+        QuizView quizView = new QuizView(quizViewModel, null);
+        quizView.setController(quizController);
 
-            QuizPresenter presenter = new QuizPresenter(viewModel);
-            SubmitAnswerInteractor interactor = new SubmitAnswerInteractor(presenter, repo);
+        String firstQuestionText = quizRepository.getQuestions()[0][0];
+        String[] firstOptions = quizRepository.getOptions()[0];
+        SubmitAnswerOutputData firstQuestionData = new SubmitAnswerOutputData(
+                -1, -1, 0, firstQuestionText, firstOptions
+        );
+        quizPresenter.presentNextQuestion(firstQuestionData);
 
-
-            QuizController controller = new QuizController(interactor);
-            quizView.setController(controller);
-
-
-            interactor.submitAnswer(new SubmitAnswerInputData(-1, -1));
-
-
-
-            JFrame frame = new JFrame("Quiz Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(quizView);
-            frame.setSize(500, 400);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
+        application.add(quizView);
+        application.pack();
+        application.setSize(600, 400);
+        application.setLocationRelativeTo(null);
+        application.setVisible(true);
     }
 }
-

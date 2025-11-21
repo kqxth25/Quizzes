@@ -13,13 +13,11 @@ public class QuizState {
     public QuizState(int totalQuestions) {
         this.totalQuestions = totalQuestions;
         this.selectedAnswers = new int[totalQuestions];
-        Arrays.fill(this.selectedAnswers, -1); // -1 表示未选择
+        Arrays.fill(this.selectedAnswers, -1);
         this.currentQuestionIndex = 0;
         this.questionText = "";
         this.options = new String[0];
     }
-
-
 
     public int getCurrentQuestionIndex() {
         return currentQuestionIndex;
@@ -28,7 +26,6 @@ public class QuizState {
     public void setCurrentQuestionIndex(int currentQuestionIndex) {
         this.currentQuestionIndex = currentQuestionIndex;
     }
-
 
     public int getTotalQuestions() {
         return totalQuestions;
@@ -60,13 +57,18 @@ public class QuizState {
         }
     }
 
+    public int getAnswer(int questionIndex) {
+        if (questionIndex >= 0 && questionIndex < totalQuestions) {
+            return selectedAnswers[questionIndex];
+        }
+        return -1;
+    }
+
     public boolean hasNext() {
         return currentQuestionIndex < totalQuestions - 1;
     }
-
 
     public boolean hasPrevious() {
         return currentQuestionIndex > 0;
     }
 }
-

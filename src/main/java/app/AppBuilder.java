@@ -67,6 +67,11 @@ public class AppBuilder {
     private CreatorLoginView creatorLoginView;
     private CreatorLoginViewModel creatorLoginViewModel;
 
+    // Quiz-related components that need to be shared
+    private QuizViewModel quizViewModel;
+    private QuizController quizController;
+    private QuizView quizView;
+
     private final ViewManager viewManager;
 
 
@@ -104,7 +109,12 @@ public class AppBuilder {
 
     public AppBuilder addSelectQuizView() {
         this.selectQuizViewModel = new SelectQuizViewModel();
-        this.selectQuizView = new SelectQuizView(this.selectQuizViewModel, this.viewManagerModel);
+        this.selectQuizView = new SelectQuizView(
+                this.selectQuizViewModel,
+                this.viewManagerModel,
+                this.quizViewModel,
+                this.quizController
+        );
         this.cardPanel.add(this.selectQuizView, this.selectQuizView.getViewName());
         return this;
     }
@@ -149,36 +159,47 @@ public class AppBuilder {
 
         return this;
     }
-    private QuizView quizView;
-    private QuizViewModel quizViewModel;
-
     public AppBuilder addQuizView() {
-        this.quizViewModel = new QuizViewModel(new QuizState(2));
-        this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
-        this.cardPanel.add(this.quizView, "hh");
-        return this;
-    }
-
-    public AppBuilder addQuizUseCase() {
-
         String[][] questions = {
-                {"What is 2 + 2?"},
-                {"What is 3 + 5?"}
+                {"1. What is the capital of France?"},
+                {"2. Which planet is known as the Red Planet?"},
+                {"3. What is the largest mammal in the world?"},
+                {"4. Who wrote 'Romeo and Juliet'?"},
+                {"5. The chemical symbol for water is H2O."},
+                {"6. How many continents are there?"},
+                {"7. The square root of 81 is 9."},
+                {"8. In which country are the Pyramids of Giza located?"},
+                {"9. What is the main ingredient in guacamole?"},
+                {"10. Who painted the Mona Lisa?"}
         };
         String[][] options = {
-                {"1", "2", "3", "4"},
-                {"5", "6", "7", "8"}
+                {"Paris", "London", "Berlin", "Madrid"},
+                {"Earth", "Mars", "Jupiter", "Venus"},
+                {"Elephant", "Blue Whale", "Giraffe", "Great White Shark"},
+                {"Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"},
+                {"True", "False"},
+                {"5", "6", "7", "8"},
+                {"True", "False"},
+                {"Greece", "Mexico", "Egypt", "Italy"},
+                {"Tomato", "Avocado", "Onion", "Lime"},
+                {"Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"}
         };
+        int[] correctAnswers = {0, 1, 1, 1, 0, 2, 0, 2, 1, 2};
+        QuizRepository repository = new LocalQuizRepository(questions, options,correctAnswers);
 
-        QuizRepository repository = new LocalQuizRepository(questions, options);
+        this.quizViewModel = new QuizViewModel(new QuizState(questions.length));
         QuizPresenter presenter = new QuizPresenter(this.quizViewModel);
         SubmitAnswerInputBoundary interactor = new SubmitAnswerInteractor(presenter, repository);
-        QuizController controller = new QuizController(interactor);
+        this.quizController = new QuizController(interactor);
 
-        this.quizView.setController(controller);
+        this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
+        this.quizView.setController(this.quizController);
+        this.cardPanel.add(this.quizView, "quiz");
 
         return this;
+
     }
+
     public AppBuilder addSelectQuizUseCase(ListQuizzesDataAccessInterface externalQuizDao) {
         this.quizDao = externalQuizDao;
         return addSelectQuizUseCase();
