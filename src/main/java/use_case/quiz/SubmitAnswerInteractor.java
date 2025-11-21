@@ -18,7 +18,7 @@ public class SubmitAnswerInteractor implements SubmitAnswerInputBoundary {
 
         int currentIndex = inputData.getQuestionIndex();
         int nextIndex = Math.min(currentIndex + 1, questions.length - 1);
-        String questionText = questions[nextIndex][0]; // 假设题目文本在数组的第一列
+        String questionText = questions[nextIndex][0];
         String[] opts = options[nextIndex];
 
         SubmitAnswerOutputData outputData = new SubmitAnswerOutputData(
@@ -30,5 +30,59 @@ public class SubmitAnswerInteractor implements SubmitAnswerInputBoundary {
         );
 
         presenter.presentAnswer(outputData);
+    }
+
+    @Override
+    public void next(SubmitAnswerInputData inputData) {
+        String[][] questions = repository.getQuestions();
+        String[][] options = repository.getOptions();
+
+        int currentIndex = inputData.getQuestionIndex();
+
+        if (currentIndex >= questions.length - 1) {
+            presenter.presentNavigationWarning("Already at the last question");
+            return;
+        }
+
+        int nextIndex = currentIndex + 1;
+        String questionText = questions[nextIndex][0];
+        String[] opts = options[nextIndex];
+
+        SubmitAnswerOutputData outputData = new SubmitAnswerOutputData(
+                currentIndex,
+                inputData.getSelectedOption(),
+                nextIndex,
+                questionText,
+                opts
+        );
+
+        presenter.presentNextQuestion(outputData);
+    }
+
+    @Override
+    public void previous(SubmitAnswerInputData inputData) {
+        String[][] questions = repository.getQuestions();
+        String[][] options = repository.getOptions();
+
+        int currentIndex = inputData.getQuestionIndex();
+
+        if (currentIndex <= 0) {
+            presenter.presentNavigationWarning("Already at the first question");
+            return;
+        }
+
+        int prevIndex = currentIndex - 1;
+        String questionText = questions[prevIndex][0];
+        String[] opts = options[prevIndex];
+
+        SubmitAnswerOutputData outputData = new SubmitAnswerOutputData(
+                currentIndex,
+                inputData.getSelectedOption(),
+                prevIndex,
+                questionText,
+                opts
+        );
+
+        presenter.presentPreviousQuestion(outputData);
     }
 }
