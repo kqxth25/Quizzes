@@ -18,4 +18,3 @@ public final class ViewManagerState {
     public void clearRouteParams() { routeParams.clear(); }
     public void putRouteParam(String k, Object v) { routeParams.put(k, v); }
 }
-

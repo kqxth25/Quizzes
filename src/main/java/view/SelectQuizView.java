@@ -1,6 +1,9 @@
 package view;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.quiz.QuizController;
+import interface_adapter.quiz.QuizViewModel;
+import interface_adapter.quiz.QuizState;
 import interface_adapter.selectquiz.ListQuizzesController;
 import interface_adapter.selectquiz.SelectQuizViewModel;
 import use_case.selectquiz.QuizItemDto;
@@ -17,6 +20,8 @@ public class SelectQuizView extends JPanel implements ActionListener {
     private final String viewName = "select quiz";
     private final SelectQuizViewModel viewModel;
     private final ViewManagerModel nav;
+    private final QuizViewModel quizViewModel;
+    private final QuizController quizController;
 
     private ListQuizzesController controller;
 
@@ -25,10 +30,14 @@ public class SelectQuizView extends JPanel implements ActionListener {
     private final JButton historyButton = new JButton("View History");
     private final JLabel statusLabel = new JLabel("");
 
-    public SelectQuizView(final SelectQuizViewModel viewModel,
-                          final ViewManagerModel nav) {
+    public SelectQuizView(SelectQuizViewModel viewModel,
+                          ViewManagerModel nav,
+                          QuizViewModel quizViewModel,
+                          QuizController quizController) {
         this.viewModel = viewModel;
         this.nav = nav;
+        this.quizViewModel = quizViewModel;
+        this.quizController = quizController;
 
         setLayout(new BorderLayout(10, 10));
 
@@ -89,12 +98,13 @@ public class SelectQuizView extends JPanel implements ActionListener {
     }
 
     private void onQuizSelected(QuizItemDto quiz) {
-        JOptionPane.showMessageDialog(
-                this,
-                "Selected quiz: " + quiz.getTitle() + "\nDifficulty: " + quiz.getDifficulty(),
-                "Quiz Selected",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+
+        QuizState initialState = new QuizState(10);
+        quizViewModel.setState(initialState);
+
+        quizController.next(-1, -1);
+
+        nav.navigate("quiz");
     }
 
     @Override
