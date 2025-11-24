@@ -98,6 +98,7 @@ public class SelectQuizView extends JPanel implements ActionListener {
     }
 
     private void onQuizSelected(QuizItemDto quiz) {
+
         QuizState initialState = new QuizState(10);
         quizViewModel.setState(initialState);
 

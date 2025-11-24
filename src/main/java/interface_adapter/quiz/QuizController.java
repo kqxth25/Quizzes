@@ -1,27 +1,27 @@
 package interface_adapter.quiz;
 
-import use_case.quiz.SubmitAnswerInputBoundary;
-import use_case.quiz.SubmitAnswerInputData;
+import use_case.quiz.AnswerQuizInputBoundary;
+import use_case.quiz.AnswerQuizInputData;
 
 public class QuizController {
-    private final SubmitAnswerInputBoundary submitAnswerUseCase;
+    private final AnswerQuizInputBoundary submitAnswerUseCase;
 
-    public QuizController(SubmitAnswerInputBoundary submitAnswerUseCase) {
+    public QuizController(AnswerQuizInputBoundary submitAnswerUseCase) {
         this.submitAnswerUseCase = submitAnswerUseCase;
     }
 
     public void submitAnswer(int questionIndex, int selectedOption) {
-        SubmitAnswerInputData inputData = new SubmitAnswerInputData(questionIndex, selectedOption);
+        AnswerQuizInputData inputData = new AnswerQuizInputData(questionIndex, selectedOption);
         submitAnswerUseCase.submitAnswer(inputData);
     }
 
     public void next(int currentIndex, int selectedOption) {
-        SubmitAnswerInputData inputData = new SubmitAnswerInputData(currentIndex, selectedOption);
+        AnswerQuizInputData inputData = new AnswerQuizInputData(currentIndex, selectedOption);
         submitAnswerUseCase.next(inputData);
     }
 
     public void previous(int currentIndex, int selectedOption) {
-        SubmitAnswerInputData inputData = new SubmitAnswerInputData(currentIndex, selectedOption);
+        AnswerQuizInputData inputData = new AnswerQuizInputData(currentIndex, selectedOption);
         submitAnswerUseCase.previous(inputData);
     }
 }

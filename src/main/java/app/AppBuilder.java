@@ -40,9 +40,8 @@ import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.quiz.QuizState;
 import use_case.quiz.LocalQuizRepository;
 import use_case.quiz.QuizRepository;
-import use_case.quiz.SubmitAnswerInteractor;
-import use_case.quiz.SubmitAnswerInputBoundary;
-import use_case.quiz.SubmitAnswerOutputBoundary;
+import use_case.quiz.AnswerQuizInteractor;
+import use_case.quiz.AnswerQuizInputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,7 +66,6 @@ public class AppBuilder {
     private CreatorLoginView creatorLoginView;
     private CreatorLoginViewModel creatorLoginViewModel;
 
-    // Quiz-related components that need to be shared
     private QuizViewModel quizViewModel;
     private QuizController quizController;
     private QuizView quizView;
@@ -189,7 +187,7 @@ public class AppBuilder {
 
         this.quizViewModel = new QuizViewModel(new QuizState(questions.length));
         QuizPresenter presenter = new QuizPresenter(this.quizViewModel);
-        SubmitAnswerInputBoundary interactor = new SubmitAnswerInteractor(presenter, repository);
+        AnswerQuizInputBoundary interactor = new AnswerQuizInteractor(presenter, repository);
         this.quizController = new QuizController(interactor);
 
         this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);

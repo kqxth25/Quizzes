@@ -66,31 +66,23 @@ public class QuizView extends JPanel implements PropertyChangeListener {
 
         QuizState state = viewModel.getState();
 
-        if (!state.hasNext()) {
-            JOptionPane.showMessageDialog(this,
-                    "You are at the last question.",
-                    "Navigation Warning",
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+        int selected = getSelectedOption();
 
-        int selected = -1;
+
+        if ("Submit".equals(nextButton.getText())) {
+            controller.submitAnswer(state.getCurrentQuestionIndex(), selected);
+        } else {
+            controller.next(state.getCurrentQuestionIndex(), selected);
+        }
+    }
+
+    private int getSelectedOption() {
         for (int i = 0; i < options.length; i++) {
             if (options[i].isSelected()) {
-                selected = i;
-                break;
+                return i;
             }
         }
-
-        if (selected == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please select an answer before proceeding.",
-                    "No Answer Selected",
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        controller.next(state.getCurrentQuestionIndex(), selected);
+        return -1;
     }
 
     private void onPrevious(ActionEvent e) {
@@ -106,14 +98,7 @@ public class QuizView extends JPanel implements PropertyChangeListener {
             return;
         }
 
-        int selected = -1;
-        for (int i = 0; i < options.length; i++) {
-            if (options[i].isSelected()) {
-                selected = i;
-                break;
-            }
-        }
-
+        int selected = getSelectedOption();
         controller.previous(state.getCurrentQuestionIndex(), selected);
     }
 
@@ -147,7 +132,11 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         }
 
         previousButton.setEnabled(state.hasPrevious());
-        nextButton.setEnabled(state.hasNext());
+        if (state.hasNext()) {
+            nextButton.setText("Next");
+        } else {
+            nextButton.setText("Submit");
+        }
 
         revalidate();
         repaint();

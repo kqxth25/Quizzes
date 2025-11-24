@@ -26,3 +26,4 @@ public class LocalQuizRepository implements QuizRepository {
         return correctAnswers;
     }
 }
+

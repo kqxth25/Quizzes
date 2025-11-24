@@ -6,8 +6,8 @@ import interface_adapter.quiz.QuizState;
 import interface_adapter.quiz.QuizViewModel;
 import use_case.quiz.LocalQuizRepository;
 import use_case.quiz.QuizRepository;
-import use_case.quiz.SubmitAnswerInteractor;
-import use_case.quiz.SubmitAnswerOutputData;
+import use_case.quiz.AnswerQuizInteractor;
+import use_case.quiz.AnswerQuizOutputData;
 import view.QuizView;
 
 import javax.swing.*;
@@ -44,16 +44,18 @@ public class MainQuizTest {
                 {"Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"}
         };
 
+
         int[] correctAnswers = {0, 1, 1, 1, 0, 2, 0, 2, 1, 2};
 
         QuizRepository quizRepository = new LocalQuizRepository(questions, options, correctAnswers);
+
 
         int totalQuestions = quizRepository.getQuestions().length;
         QuizState quizState = new QuizState(totalQuestions);
         QuizViewModel quizViewModel = new QuizViewModel(quizState);
 
         QuizPresenter quizPresenter = new QuizPresenter(quizViewModel);
-        SubmitAnswerInteractor submitAnswerInteractor = new SubmitAnswerInteractor(quizPresenter, quizRepository);
+        AnswerQuizInteractor submitAnswerInteractor = new AnswerQuizInteractor(quizPresenter, quizRepository);
 
         QuizController quizController = new QuizController(submitAnswerInteractor);
 
@@ -62,7 +64,7 @@ public class MainQuizTest {
 
         String firstQuestionText = quizRepository.getQuestions()[0][0];
         String[] firstOptions = quizRepository.getOptions()[0];
-        SubmitAnswerOutputData firstQuestionData = new SubmitAnswerOutputData(
+        AnswerQuizOutputData firstQuestionData = new AnswerQuizOutputData(
                 -1, -1, 0, firstQuestionText, firstOptions
         );
         quizPresenter.presentNextQuestion(firstQuestionData);

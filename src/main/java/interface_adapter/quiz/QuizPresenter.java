@@ -1,9 +1,9 @@
 package interface_adapter.quiz;
 
-import use_case.quiz.SubmitAnswerOutputData;
-import use_case.quiz.SubmitAnswerOutputBoundary;
+import use_case.quiz.AnswerQuizOutputData;
+import use_case.quiz.AnswerQuizOutputBoundary;
 
-public class QuizPresenter implements SubmitAnswerOutputBoundary {
+public class QuizPresenter implements AnswerQuizOutputBoundary {
     private final QuizViewModel viewModel;
 
     public QuizPresenter(QuizViewModel viewModel) {
@@ -11,7 +11,7 @@ public class QuizPresenter implements SubmitAnswerOutputBoundary {
     }
 
     @Override
-    public void presentAnswer(SubmitAnswerOutputData outputData) {
+    public void presentAnswer(AnswerQuizOutputData outputData) {
         QuizState state = viewModel.getState();
         state.setAnswer(outputData.getQuestionIndex(), outputData.getSelectedOption());
         state.setCurrentQuestionIndex(outputData.getNextQuestionIndex());
@@ -20,9 +20,8 @@ public class QuizPresenter implements SubmitAnswerOutputBoundary {
         viewModel.firePropertyChanged();
     }
 
-
     @Override
-    public void presentNextQuestion(SubmitAnswerOutputData outputData) {
+    public void presentNextQuestion(AnswerQuizOutputData outputData) {
         QuizState state = viewModel.getState();
         if (outputData.getSelectedOption() != -1) {
             state.setAnswer(outputData.getQuestionIndex(), outputData.getSelectedOption());
@@ -34,7 +33,7 @@ public class QuizPresenter implements SubmitAnswerOutputBoundary {
     }
 
     @Override
-    public void presentPreviousQuestion(SubmitAnswerOutputData outputData) {
+    public void presentPreviousQuestion(AnswerQuizOutputData outputData) {
         QuizState state = viewModel.getState();
         if (outputData.getSelectedOption() != -1) {
             state.setAnswer(outputData.getQuestionIndex(), outputData.getSelectedOption());
