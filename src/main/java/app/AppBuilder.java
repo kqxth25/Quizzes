@@ -86,7 +86,7 @@ public class AppBuilder {
 
     public AppBuilder addCreatorLoginView() {
         this.creatorLoginViewModel = new CreatorLoginViewModel();
-        this.creatorLoginView = new CreatorLoginView();
+        this.creatorLoginView = new CreatorLoginView(this.viewManagerModel);
         this.cardPanel.add(this.creatorLoginView, this.creatorLoginView.getViewName());
         return this;
     }
