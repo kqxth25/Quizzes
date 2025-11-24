@@ -3,11 +3,14 @@ package use_case.quizimport;
 import entity.Quiz;
 
 public class QuizImportOutputData {
-    public Quiz quiz;
-    public boolean success;
+    private final Quiz quiz;
+    private final String error;
 
-    public QuizImportOutputData(Quiz quiz, boolean success) {
+    public QuizImportOutputData(Quiz quiz, String error) {
         this.quiz = quiz;
-        this.success = success;
+        this.error = error;
     }
+
+    public Quiz getQuiz() { return quiz; }
+    public String getError() { return error; }
 }

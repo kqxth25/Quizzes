@@ -3,7 +3,6 @@ package entity;
 import java.util.List;
 
 public class Quiz {
-
     private final String name;
     private final int amount;
     private final String category;
@@ -21,23 +20,5 @@ public class Quiz {
     }
 
     public String getName() { return name; }
-
     public List<Question> getQuestions() { return questions; }
-
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public String getType() {
-        return type;
-    }
 }
