@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.creator_login.CreatorLoginController;
 
 import javax.swing.*;
@@ -8,11 +9,13 @@ import java.awt.*;
 public class CreatorLoginView extends JPanel {
 
     private CreatorLoginController controller;
+    private final ViewManagerModel viewManagerModel;
     private final String viewName = "creator login";
 
     private final JTextField passwordField = new JPasswordField(15);
 
-    public CreatorLoginView() {
+    public CreatorLoginView(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
         buildUI();
     }
 
@@ -45,6 +48,10 @@ public class CreatorLoginView extends JPanel {
         gbc.gridy = 3;
         add(loginBtn, gbc);
 
+        JButton backBtn = new JButton("Go Back");
+        gbc.gridy = 4;
+        add(backBtn, gbc);
+
         loginBtn.addActionListener(e -> {
             if (controller != null) {
                 controller.execute(passwordField.getText());
@@ -52,5 +59,18 @@ public class CreatorLoginView extends JPanel {
                 System.out.println("CreatorLoginController not set!");
             }
         });
+
+        loginBtn.addActionListener(e -> {
+            if (controller != null) {
+                controller.execute(passwordField.getText());
+            } else {
+                System.out.println("CreatorLoginController not set!");
+            }
+        });
+
+        backBtn.addActionListener(e -> {
+            viewManagerModel.navigate("home");
+        });
+
     }
 }
