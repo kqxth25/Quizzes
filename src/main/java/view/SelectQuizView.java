@@ -1,6 +1,9 @@
 package view;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.quiz.QuizController;
+import interface_adapter.quiz.QuizState;
+import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.selectquiz.ListQuizzesController;
 import interface_adapter.selectquiz.SelectQuizViewModel;
 import use_case.selectquiz.QuizItemDto;
@@ -9,14 +12,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 
-public class SelectQuizView extends JPanel implements ActionListener {
+public class SelectQuizView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "select quiz";
+
     private final SelectQuizViewModel viewModel;
     private final ViewManagerModel nav;
+    private final QuizViewModel quizViewModel;
+    private final QuizController quizController;
 
     private ListQuizzesController controller;
 
@@ -25,10 +33,16 @@ public class SelectQuizView extends JPanel implements ActionListener {
     private final JButton historyButton = new JButton("View History");
     private final JLabel statusLabel = new JLabel("");
 
-    public SelectQuizView(final SelectQuizViewModel viewModel,
-                          final ViewManagerModel nav) {
+    public SelectQuizView(SelectQuizViewModel viewModel,
+                          ViewManagerModel nav,
+                          QuizViewModel quizViewModel,
+                          QuizController quizController) {
         this.viewModel = viewModel;
         this.nav = nav;
+        this.quizViewModel = quizViewModel;
+        this.quizController = quizController;
+
+        this.viewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout(10, 10));
 
@@ -48,12 +62,21 @@ public class SelectQuizView extends JPanel implements ActionListener {
 
         backButton.addActionListener(this);
         historyButton.addActionListener(this);
+
+        updateFromViewModel();
     }
 
     public void setController(ListQuizzesController controller) {
         this.controller = controller;
         if (this.controller != null) {
             this.controller.execute();
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("state".equals(evt.getPropertyName())) {
+            updateFromViewModel();
         }
     }
 
@@ -64,20 +87,17 @@ public class SelectQuizView extends JPanel implements ActionListener {
         if (quizzes == null || quizzes.isEmpty()) {
             JLabel empty = new JLabel("No quizzes available.");
             empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            quizListPanel.add(Box.createVerticalStrut(20));
             quizListPanel.add(empty);
             statusLabel.setText("");
-        }
-        else {
+        } else {
             for (QuizItemDto q : quizzes) {
                 final QuizItemDto item = q;
+
                 JButton quizButton = new JButton(item.getTitle() + " (" + item.getDifficulty() + ")");
                 quizButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-                quizButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        onQuizSelected(item);
-                    }
-                });
+                quizButton.addActionListener(e -> onQuizSelected(item));
+
                 quizListPanel.add(Box.createVerticalStrut(8));
                 quizListPanel.add(quizButton);
             }
@@ -88,13 +108,14 @@ public class SelectQuizView extends JPanel implements ActionListener {
         quizListPanel.repaint();
     }
 
+
     private void onQuizSelected(QuizItemDto quiz) {
-        JOptionPane.showMessageDialog(
-                this,
-                "Selected quiz: " + quiz.getTitle() + "\nDifficulty: " + quiz.getDifficulty(),
-                "Quiz Selected",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        QuizState initialState = new QuizState(10);
+        quizViewModel.setState(initialState);
+
+        quizController.next(-1, -1);
+
+        nav.navigate("quiz");
     }
 
     @Override
