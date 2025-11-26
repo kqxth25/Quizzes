@@ -2,9 +2,10 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import data_access.QuizRepository;
 
 public class DeleteConfirmDialog extends JDialog {
-    public DeleteConfirmDialog(JFrame parent, String quizName, DefaultListModel<String> model) {
+    public DeleteConfirmDialog(JFrame parent, String quizName, QuizRepository repository, Runnable onDelete) {
         super(parent, "Confirm Delete", true);
         setSize(300,150);
         setLocationRelativeTo(parent);
@@ -21,7 +22,8 @@ public class DeleteConfirmDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         yesBtn.addActionListener(e -> {
-            model.removeElement(quizName);
+            repository.deleteQuiz(quizName);
+            onDelete.run();
             dispose();
         });
         noBtn.addActionListener(e -> dispose());

@@ -1,16 +1,11 @@
 package use_case.quizimport;
 
-import entity.Quiz;
-
 public class QuizImportOutputData {
-    private final Quiz quiz;
-    private final String error;
+    private final String quizName;
 
-    public QuizImportOutputData(Quiz quiz, String error) {
-        this.quiz = quiz;
-        this.error = error;
+    public QuizImportOutputData(String quizName) {
+        this.quizName = quizName;
     }
 
-    public Quiz getQuiz() { return quiz; }
-    public String getError() { return error; }
+    public String getQuizName() { return quizName; }
 }
