@@ -1,6 +1,7 @@
 package interface_adapter.quizimport;
 
-import use_case.quizimport.*;
+import entity.Quiz;
+import use_case.quizimport.QuizImportOutputBoundary;
 import view.ImportQuizFrame;
 
 public class QuizImportPresenter implements QuizImportOutputBoundary {
@@ -12,11 +13,12 @@ public class QuizImportPresenter implements QuizImportOutputBoundary {
     }
 
     @Override
-    public void present(QuizImportOutputData outputData) {
-        if (outputData.getError() != null) {
-            view.showError(outputData.getError());
-        } else {
-            view.showSuccess(outputData.getQuiz());
-        }
+    public void presentSuccess(Quiz quiz) {
+        view.showSuccess(quiz);
+    }
+
+    @Override
+    public void presentError(String errorMessage) {
+        view.showError(errorMessage);
     }
 }
