@@ -85,8 +85,10 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginView() {
+        // create the ViewModel first
         this.creatorLoginViewModel = new CreatorLoginViewModel();
-        this.creatorLoginView = new CreatorLoginView();
+        // pass the ViewModel into the CreatorLoginView so it can listen for updates
+        this.creatorLoginView = new CreatorLoginView(this.viewManagerModel, this.creatorLoginViewModel);
         this.cardPanel.add(this.creatorLoginView, this.creatorLoginView.getViewName());
         return this;
     }
@@ -144,8 +146,9 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginUseCase() {
+        // Presenter should be created with the CreatorLoginViewModel so it can update the view model
         CreatorLoginOutputBoundary presenter =
-                new CreatorLoginPresenter(this.viewManagerModel);
+                new CreatorLoginPresenter(this.creatorLoginViewModel);
 
         CreatorLoginInputBoundary interactor =
                 new CreatorLoginInteractor(presenter);
@@ -162,7 +165,7 @@ public class AppBuilder {
                 {"1. What is the capital of France?"},
                 {"2. Which planet is known as the Red Planet?"},
                 {"3. What is the largest mammal in the world?"},
-                {"4. Who wrote 'Romeo and Juliet'?"},
+                {"4. Who wrote 'Romeo and Juliet'"},
                 {"5. The chemical symbol for water is H2O."},
                 {"6. How many continents are there?"},
                 {"7. The square root of 81 is 9."},
