@@ -1,23 +1,26 @@
 package interface_adapter.creator_login;
 
-import interface_adapter.ViewManagerModel;
 import use_case.creator_login.CreatorLoginOutputBoundary;
 
 public class CreatorLoginPresenter implements CreatorLoginOutputBoundary {
 
-    private final ViewManagerModel viewManager;
+    private final CreatorLoginViewModel viewModel;
 
-    public CreatorLoginPresenter(ViewManagerModel viewManager) {
-        this.viewManager = viewManager;
+    public CreatorLoginPresenter(CreatorLoginViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
     public void prepareSuccessView() {
-        viewManager.navigate("manage");
+        viewModel.setLoginSuccess(true);
+        viewModel.setErrorMessage(null);
+        viewModel.firePropertyChanged();
     }
 
     @Override
     public void prepareFailedView(String errorMessage) {
-        System.out.println("Login failed: " + errorMessage);
+        viewModel.setLoginSuccess(false);
+        viewModel.setErrorMessage(errorMessage);
+        viewModel.firePropertyChanged();
     }
 }
