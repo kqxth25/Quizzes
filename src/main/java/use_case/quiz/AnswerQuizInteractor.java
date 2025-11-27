@@ -2,9 +2,9 @@ package use_case.quiz;
 
 public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
     private final AnswerQuizOutputBoundary presenter;
-    private final QuizRepository repository;
+    private final QuizRepository_answer repository;
 
-    public AnswerQuizInteractor(AnswerQuizOutputBoundary presenter, QuizRepository repository) {
+    public AnswerQuizInteractor(AnswerQuizOutputBoundary presenter, QuizRepository_answer repository) {
         this.presenter = presenter;
         this.repository = repository;
     }

@@ -4,8 +4,8 @@ import interface_adapter.quiz.QuizController;
 import interface_adapter.quiz.QuizPresenter;
 import interface_adapter.quiz.QuizState;
 import interface_adapter.quiz.QuizViewModel;
-import use_case.quiz.LocalQuizRepository;
-import use_case.quiz.QuizRepository;
+import use_case.quiz.LocalQuizRepositoryAnswer;
+import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizOutputData;
 import view.QuizView;
@@ -47,23 +47,23 @@ public class MainQuizTest {
 
         int[] correctAnswers = {0, 1, 1, 1, 0, 2, 0, 2, 1, 2};
 
-        QuizRepository quizRepository = new LocalQuizRepository(questions, options, correctAnswers);
+        QuizRepository_answer quizRepositoryAnswer = new LocalQuizRepositoryAnswer(questions, options, correctAnswers);
 
 
-        int totalQuestions = quizRepository.getQuestions().length;
+        int totalQuestions = quizRepositoryAnswer.getQuestions().length;
         QuizState quizState = new QuizState(totalQuestions);
         QuizViewModel quizViewModel = new QuizViewModel(quizState);
 
         QuizPresenter quizPresenter = new QuizPresenter(quizViewModel);
-        AnswerQuizInteractor submitAnswerInteractor = new AnswerQuizInteractor(quizPresenter, quizRepository);
+        AnswerQuizInteractor submitAnswerInteractor = new AnswerQuizInteractor(quizPresenter, quizRepositoryAnswer);
 
         QuizController quizController = new QuizController(submitAnswerInteractor);
 
         QuizView quizView = new QuizView(quizViewModel, null);
         quizView.setController(quizController);
 
-        String firstQuestionText = quizRepository.getQuestions()[0][0];
-        String[] firstOptions = quizRepository.getOptions()[0];
+        String firstQuestionText = quizRepositoryAnswer.getQuestions()[0][0];
+        String[] firstOptions = quizRepositoryAnswer.getOptions()[0];
         AnswerQuizOutputData firstQuestionData = new AnswerQuizOutputData(
                 -1, -1, 0, firstQuestionText, firstOptions
         );
