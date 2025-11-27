@@ -14,10 +14,11 @@ public class Main {
                         .addSelectQuizView()
                         .addQuizView()
                         .addCreatorLoginView()
-                        .addSelectQuizUseCase()
-                        .addCreatorLoginUseCase()
+                        .addManageQuizView()
                         .addSignupUseCase()
                         .addLoginUseCase()
+                        .addSelectQuizUseCase()
+                        .addCreatorLoginUseCase()
                         .build();
                 app.setVisible(true);
             }

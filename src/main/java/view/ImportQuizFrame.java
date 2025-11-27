@@ -1,25 +1,25 @@
 package view;
 
-import data_access.QuizRepository;
+import interface_adapter.quizimport.CategoryMapper;
 import interface_adapter.quizimport.QuizImportController;
 import interface_adapter.quizimport.QuizImportPresenter;
 import use_case.quizimport.QuizImportInteractor;
+import use_case.quizimport.QuizRepository_import;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.DocumentFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
-import interface_adapter.quizimport.CategoryMapper;
 
 public class ImportQuizFrame extends JFrame {
     private final QuizImportController controller;
-    private final QuizListFrame parentListFrame;
+    private final Runnable onImported;
 
-    public ImportQuizFrame(JFrame parent, QuizRepository repository, QuizListFrame parentListFrame) {
+    public ImportQuizFrame(JFrame parent, QuizRepository_import repository, Runnable onImported) {
         super("Import Quiz");
-        this.parentListFrame = parentListFrame;
+        this.onImported = onImported;
 
         setSize(420, 320);
         setLocationRelativeTo(parent);
@@ -48,10 +48,12 @@ public class ImportQuizFrame extends JFrame {
         JTextField amountField = new JTextField("10", 6);
         // restrict to digits
         ((AbstractDocument) amountField.getDocument()).setDocumentFilter(new DocumentFilter() {
-            @Override public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            @Override public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
                 if (string.matches("\\d*")) super.insertString(fb, offset, string, attr);
             }
-            @Override public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            @Override public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
                 if (text.matches("\\d*")) super.replace(fb, offset, length, text, attrs);
             }
         });
@@ -86,10 +88,12 @@ public class ImportQuizFrame extends JFrame {
         importBtn.addActionListener(e -> {
             try {
                 String name = nameField.getText().trim();
-                if (name.isEmpty()) { JOptionPane.showMessageDialog(this, "Please enter a name."); return; }
+                if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please enter a name."); return; }
 
                 int amount = Integer.parseInt(amountField.getText().trim());
-                if (amount <= 0) { JOptionPane.showMessageDialog(this, "Amount must be > 0"); return; }
+                if (amount <= 0) {
+                    JOptionPane.showMessageDialog(this, "Amount must be > 0"); return; }
 
                 String category = (String) categoryBox.getSelectedItem(); // human name, maybe "Any"
                 String difficulty = ((String) difficultyBox.getSelectedItem()).toLowerCase(); // "any","easy",...
@@ -115,8 +119,9 @@ public class ImportQuizFrame extends JFrame {
     // called by presenter on success
     public void showSuccess(entity.Quiz quiz) {
         JOptionPane.showMessageDialog(this, "Imported: " + quiz.getName());
-        // refresh parent list view
-        if (parentListFrame != null) parentListFrame.refreshQuizList();
+        if (onImported != null) {
+            onImported.run();
+        }
         dispose();
     }
 

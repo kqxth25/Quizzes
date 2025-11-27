@@ -1,5 +1,6 @@
 package app;
 
+import data_access.InMemoryQuizRepository;
 import data_access.InMemoryUserDataAccessObject;
 import data_access.InMemoryQuizDataAccess;
 import entity.UserFactory;
@@ -16,6 +17,7 @@ import interface_adapter.selectquiz.SelectQuizViewModel;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.quizimport.QuizRepository_import;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -23,23 +25,17 @@ import use_case.selectquiz.ListQuizzesDataAccessInterface;
 import use_case.selectquiz.ListQuizzesInputBoundary;
 import use_case.selectquiz.ListQuizzesInteractor;
 import use_case.selectquiz.ListQuizzesOutputBoundary;
-import view.ViewManager;
-import view.HomeView;
-import view.LoginView;
-import view.SignupView;
-import view.SelectQuizView;
+import view.*;
 import interface_adapter.creator_login.CreatorLoginController;
 import interface_adapter.creator_login.CreatorLoginPresenter;
 import interface_adapter.creator_login.CreatorLoginViewModel;
 import use_case.creator_login.*;
-import view.CreatorLoginView;
-import view.QuizView;
 import interface_adapter.quiz.QuizController;
 import interface_adapter.quiz.QuizPresenter;
 import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.quiz.QuizState;
-import use_case.quiz.LocalQuizRepository;
-import use_case.quiz.QuizRepository;
+import use_case.quiz.LocalQuizRepositoryAnswer;
+import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
 
@@ -53,7 +49,9 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final UserFactory userFactory = new UserFactory();
     private final InMemoryUserDataAccessObject userDao = new InMemoryUserDataAccessObject();
-    private ListQuizzesDataAccessInterface quizDao = new InMemoryQuizDataAccess();
+
+    private final QuizRepository_import manageQuizRepository = new InMemoryQuizRepository();
+    private ListQuizzesDataAccessInterface quizDao = new InMemoryQuizDataAccess(manageQuizRepository);
 
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -69,6 +67,8 @@ public class AppBuilder {
     private QuizViewModel quizViewModel;
     private QuizController quizController;
     private QuizView quizView;
+
+    private ManageQuizView manageQuizView;
 
     private final ViewManager viewManager;
 
@@ -119,6 +119,11 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addManageQuizView() {
+        this.manageQuizView = new ManageQuizView(this.viewManagerModel, this.manageQuizRepository);
+        this.cardPanel.add(this.manageQuizView, this.manageQuizView.getViewName());
+        return this;
+    }
 
     public AppBuilder addSignupUseCase() {
         SignupOutputBoundary presenter =
@@ -148,7 +153,7 @@ public class AppBuilder {
     public AppBuilder addCreatorLoginUseCase() {
         // Presenter should be created with the CreatorLoginViewModel so it can update the view model
         CreatorLoginOutputBoundary presenter =
-                new CreatorLoginPresenter(this.creatorLoginViewModel);
+                new CreatorLoginPresenter(this.viewManagerModel, this.creatorLoginViewModel);
 
         CreatorLoginInputBoundary interactor =
                 new CreatorLoginInteractor(presenter);
@@ -186,7 +191,7 @@ public class AppBuilder {
                 {"Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"}
         };
         int[] correctAnswers = {0, 1, 1, 1, 0, 2, 0, 2, 1, 2};
-        QuizRepository repository = new LocalQuizRepository(questions, options,correctAnswers);
+        QuizRepository_answer repository = new LocalQuizRepositoryAnswer(questions, options,correctAnswers);
 
         this.quizViewModel = new QuizViewModel(new QuizState(questions.length));
         QuizPresenter presenter = new QuizPresenter(this.quizViewModel);

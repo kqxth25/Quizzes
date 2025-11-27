@@ -1,6 +1,5 @@
 package use_case.quizimport;
 
-import data_access.QuizRepository;
 import entity.Question;
 import entity.Quiz;
 import interface_adapter.quizimport.CategoryMapper;
@@ -16,10 +15,10 @@ import java.util.List;
 public class QuizImportInteractor implements QuizImportInputBoundary {
 
     private final QuizImportOutputBoundary presenter;
-    private final QuizRepository repository;
+    private final QuizRepository_import repository;
     private final OkHttpClient client = new OkHttpClient();
 
-    public QuizImportInteractor(QuizImportOutputBoundary presenter, QuizRepository repository) {
+    public QuizImportInteractor(QuizImportOutputBoundary presenter, QuizRepository_import repository) {
         this.presenter = presenter;
         this.repository = repository;
     }
@@ -66,7 +65,8 @@ public class QuizImportInteractor implements QuizImportInputBoundary {
                         questions
                 );
 
-                repository.addQuiz(quiz);
+                repository.save(quiz);
+
                 presenter.presentSuccess(quiz);
             }
         } catch (Exception e) {
@@ -91,14 +91,12 @@ public class QuizImportInteractor implements QuizImportInputBoundary {
 
         // type
         if (d.getType() != null && !"any".equalsIgnoreCase(d.getType())) {
-            // map UI types to API values
             String t = d.getType().toLowerCase();
             if (t.equals("boolean") || t.equals("true / false") || t.equals("true/false")) {
                 sb.append("&type=boolean");
             } else if (t.startsWith("multi")) {
                 sb.append("&type=multiple");
             } else {
-                // if exact "multiple" passed
                 sb.append("&type=").append(t);
             }
         }
@@ -107,7 +105,6 @@ public class QuizImportInteractor implements QuizImportInputBoundary {
     }
 
     private String htmlDecode(String s) {
-        // minimal decoding for common entities used by opentdb
         return s.replaceAll("&#039;", "'")
                 .replaceAll("&quot;", "\"")
                 .replaceAll("&amp;", "&")

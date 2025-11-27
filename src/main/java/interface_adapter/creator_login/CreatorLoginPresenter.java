@@ -1,12 +1,16 @@
 package interface_adapter.creator_login;
 
+import interface_adapter.ViewManagerModel;
 import use_case.creator_login.CreatorLoginOutputBoundary;
 
 public class CreatorLoginPresenter implements CreatorLoginOutputBoundary {
 
     private final CreatorLoginViewModel viewModel;
+    private final ViewManagerModel viewManagerModel;
 
-    public CreatorLoginPresenter(CreatorLoginViewModel viewModel) {
+    public CreatorLoginPresenter(ViewManagerModel viewManagerModel,
+                                 CreatorLoginViewModel viewModel) {
+        this.viewManagerModel = viewManagerModel;
         this.viewModel = viewModel;
     }
 
@@ -15,6 +19,8 @@ public class CreatorLoginPresenter implements CreatorLoginOutputBoundary {
         viewModel.setLoginSuccess(true);
         viewModel.setErrorMessage(null);
         viewModel.firePropertyChanged();
+        viewManagerModel.navigate("manage quiz");
+        viewManagerModel.firePropertyChange();
     }
 
     @Override
