@@ -2,8 +2,8 @@ package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.selectquiz.SelectQuizViewModel;
-import use_case.login.LoginOutputBoundary;
-import use_case.login.LoginOutputData;
+import use_case.user_login.LoginOutputBoundary;
+import use_case.user_login.LoginOutputData;
 
 public class LoginPresenter implements LoginOutputBoundary {
 
