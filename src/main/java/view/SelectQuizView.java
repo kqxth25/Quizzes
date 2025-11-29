@@ -183,8 +183,13 @@ public class SelectQuizView extends JPanel implements ActionListener {
     }
 
     private void onQuizSelected(QuizItemDto quiz) {
+        String quizName = quiz.getTitle();
+
+        quizController.loadQuiz(quizName);
+
         QuizState initialState = new QuizState(10);
         quizViewModel.setState(initialState);
+
         quizController.next(-1, -1);
         nav.navigate("quiz");
     }
