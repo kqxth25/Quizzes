@@ -41,7 +41,6 @@ public class ImportedQuizRepositoryAdapter implements QuizRepository_answer {
         for (int i = 0; i < size; i++) {
             Question q = questionList.get(i);
 
-            // 题目文本
             this.questions[i][0] = q.getQuestionText();
 
             List<String> allOptions = new ArrayList<>();
