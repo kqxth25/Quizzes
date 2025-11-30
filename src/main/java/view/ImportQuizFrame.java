@@ -19,7 +19,6 @@ public class ImportQuizFrame extends JFrame {
     private final QuizImportController controller;
     private final Runnable onImported;
 
-    // unified style colors (same as CreatorLoginView / SelectQuizView)
     private static final Color BG_APP = new Color(243, 244, 246);
     private static final Color TEXT_MAIN = new Color(30, 41, 59);
     private static final Color TEXT_MUTED = new Color(100, 116, 139);
@@ -28,7 +27,6 @@ public class ImportQuizFrame extends JFrame {
     private static final Color SECONDARY = new Color(148, 163, 184);
     private static final Color SECONDARY_HOVER = new Color(148, 163, 184).brighter();
 
-    // Gray input background color
     private static final Color FIELD_BG = new Color(241, 245, 249);
     private static final int FIELD_HEIGHT = 40;
 
@@ -41,7 +39,6 @@ public class ImportQuizFrame extends JFrame {
         setLayout(new GridBagLayout());
         getContentPane().setBackground(BG_APP);
 
-        // wire Clean Architecture pieces
         QuizImportPresenter presenter = new QuizImportPresenter(this);
         QuizImportInteractor interactor = new QuizImportInteractor(presenter, repository);
         this.controller = new QuizImportController(interactor);
@@ -66,7 +63,6 @@ public class ImportQuizFrame extends JFrame {
         card.add(subtitle);
         card.add(Box.createVerticalStrut(18));
 
-        // form panel
         JPanel form = new JPanel();
         form.setOpaque(false);
         form.setLayout(new GridBagLayout());
@@ -78,9 +74,6 @@ public class ImportQuizFrame extends JFrame {
         Font labelFont = new Font("Segoe UI", Font.PLAIN, 15);
         Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
 
-        // -----------------------
-        // FIELD WRAPPER CREATOR
-        // -----------------------
         class FieldWrapper extends JPanel {
             FieldWrapper(JComponent inner) {
                 setLayout(new BorderLayout());
@@ -94,7 +87,6 @@ public class ImportQuizFrame extends JFrame {
             }
         }
 
-        // -------- Custom ComboBox UI (flat modern style) --------
         class FlatComboUI extends BasicComboBoxUI {
             @Override
             protected JButton createArrowButton() {
@@ -110,11 +102,9 @@ public class ImportQuizFrame extends JFrame {
 
             @Override
             public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
-                // do nothing → keep FIELD_BG
             }
         }
 
-        // ------------- Quiz Name -------------
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel nameLabel = new JLabel("Quiz Name:");
         nameLabel.setFont(labelFont);
@@ -127,7 +117,6 @@ public class ImportQuizFrame extends JFrame {
         nameField.setBorder(null);
         form.add(new FieldWrapper(nameField), gbc);
 
-        // ------------- Number of Questions -------------
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel amountLabel = new JLabel("Number of Questions:");
         amountLabel.setFont(labelFont);
@@ -152,7 +141,6 @@ public class ImportQuizFrame extends JFrame {
 
         form.add(new FieldWrapper(amountField), gbc);
 
-        // ------------- Category -------------
         gbc.gridx = 0; gbc.gridy = 2;
         JLabel catLabel = new JLabel("Category:");
         catLabel.setFont(labelFont);
@@ -168,7 +156,6 @@ public class ImportQuizFrame extends JFrame {
 
         form.add(new FieldWrapper(categoryBox), gbc);
 
-        // ------------- Difficulty -------------
         gbc.gridx = 0; gbc.gridy = 3;
         JLabel diffLabel = new JLabel("Difficulty:");
         diffLabel.setFont(labelFont);
@@ -184,7 +171,6 @@ public class ImportQuizFrame extends JFrame {
 
         form.add(new FieldWrapper(difficultyBox), gbc);
 
-        // ------------- Type -------------
         gbc.gridx = 0; gbc.gridy = 4;
         JLabel typeLabel = new JLabel("Type:");
         typeLabel.setFont(labelFont);
@@ -202,7 +188,6 @@ public class ImportQuizFrame extends JFrame {
 
         card.add(form);
 
-        // Import button
         card.add(Box.createVerticalStrut(20));
         JButton importBtn = createPrimaryButton("Import Quiz");
         importBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -247,7 +232,6 @@ public class ImportQuizFrame extends JFrame {
         setVisible(true);
     }
 
-    // --- presenter callbacks ---
     public void showSuccess(entity.Quiz quiz) {
         Window w = SwingUtilities.getWindowAncestor(this);
         JFrame parent = w instanceof JFrame ? (JFrame) w : null;
@@ -267,7 +251,6 @@ public class ImportQuizFrame extends JFrame {
     }
 
 
-    // unified rounded buttons
     private static JButton baseButton(String text, Color bg, Color hoverBg, Color fg) {
         JButton b = new JButton(text) {
             @Override

@@ -8,7 +8,6 @@ import java.awt.*;
 
 public class QuizPreviewFrame extends JFrame {
 
-    // --------- Colors from SignupView style ---------
     private static final Color BG_APP = new Color(243, 244, 246);
     private static final Color TEXT_MAIN = new Color(30, 41, 59);
     private static final Color TEXT_MUTED = new Color(100, 116, 139);
@@ -23,7 +22,6 @@ public class QuizPreviewFrame extends JFrame {
         setLayout(new GridBagLayout());
         getContentPane().setBackground(BG_APP);
 
-        // ---------- Outer Card Panel ----------
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -45,13 +43,11 @@ public class QuizPreviewFrame extends JFrame {
         inner.setBorder(BorderFactory.createEmptyBorder(24, 28, 24, 28));
         card.add(inner);
 
-        // ---------- Title ----------
         JLabel title = new JLabel("Quiz Preview", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(TEXT_MAIN);
         inner.add(title, BorderLayout.NORTH);
 
-        // ---------- Info card ----------
         JPanel info = new JPanel(new GridLayout(3, 2, 12, 12));
         info.setOpaque(false);
 
@@ -66,7 +62,6 @@ public class QuizPreviewFrame extends JFrame {
 
         inner.add(info, BorderLayout.WEST);
 
-        // ---------- Questions list ----------
         DefaultListModel<String> qModel = new DefaultListModel<>();
         for (Question q : quiz.getQuestions()) {
             qModel.addElement("•  " + q.getQuestionText());
@@ -81,7 +76,6 @@ public class QuizPreviewFrame extends JFrame {
         scroll.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235), 1));
         inner.add(scroll, BorderLayout.CENTER);
 
-        // ---------- Add card to main layout ----------
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;

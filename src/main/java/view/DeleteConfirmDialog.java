@@ -24,13 +24,11 @@ public class DeleteConfirmDialog extends JDialog {
         setLayout(new GridBagLayout());
         getContentPane().setBackground(BG_APP);
 
-        // ---------- Card Panel with soft shadow ----------
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                // soft shadow
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -48,12 +46,10 @@ public class DeleteConfirmDialog extends JDialog {
         inner.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
         card.add(inner);
 
-        // ---------- Title ----------
         JLabel title = new JLabel("Delete Quiz", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 20));
         title.setForeground(TEXT_MAIN);
 
-        // ---------- Description ----------
         JLabel confirmLabel = new JLabel(
                 "Are you sure you want to delete \"" + quizName + "\"?",
                 SwingConstants.CENTER
@@ -68,7 +64,6 @@ public class DeleteConfirmDialog extends JDialog {
 
         inner.add(textPanel, BorderLayout.CENTER);
 
-        // ---------- Buttons ----------
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         buttonPanel.setOpaque(false);
 
@@ -80,14 +75,12 @@ public class DeleteConfirmDialog extends JDialog {
 
         inner.add(buttonPanel, BorderLayout.SOUTH);
 
-        // ---------- Add card ----------
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 1;
         gbc.weighty = 1;
         add(card, gbc);
 
-        // ---------- Logic ----------
         yesBtn.addActionListener(e -> {
             repository.delete(quizName);
             if (onDelete != null) {
@@ -101,7 +94,6 @@ public class DeleteConfirmDialog extends JDialog {
         setVisible(true);
     }
 
-    // ---------- Button styling from SignupView ----------
     private JButton baseButton(String text, Color bg, Color hover, Color fg) {
         JButton btn = new JButton(text) {
             @Override

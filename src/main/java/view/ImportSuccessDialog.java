@@ -13,7 +13,6 @@ public class ImportSuccessDialog extends JDialog {
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
-        // ---- Card Panel ----
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
@@ -34,7 +33,6 @@ public class ImportSuccessDialog extends JDialog {
         card.add(msg);
         card.add(Box.createVerticalStrut(20));
 
-        // ---- OK button ----
         JButton okBtn = new JButton("OK") {
             @Override
             protected void paintComponent(Graphics g) {

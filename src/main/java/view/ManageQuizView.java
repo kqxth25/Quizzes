@@ -26,7 +26,7 @@ public class ManageQuizView extends JPanel {
     private static final Color SECONDARY = new Color(148, 163, 184);
     private static final Color SECONDARY_HOVER = new Color(148, 163, 184).brighter();
 
-    private int hoverIndex = -1; // 安全 hover 索引
+    private int hoverIndex = -1;
 
     public ManageQuizView(ViewManagerModel viewManagerModel,
                           QuizRepository_import repository) {
@@ -41,7 +41,6 @@ public class ManageQuizView extends JPanel {
         card.setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
         card.setLayout(new BorderLayout(16, 16));
 
-        // Top panel with title and back button
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
         JLabel title = new JLabel("Manage Quizzes");
@@ -58,7 +57,6 @@ public class ManageQuizView extends JPanel {
 
         card.add(top, BorderLayout.NORTH);
 
-        // Center: quiz list
         listUI.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listUI.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         listUI.setCellRenderer(new QuizListCellRenderer());
@@ -69,10 +67,8 @@ public class ManageQuizView extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         card.add(scrollPane, BorderLayout.CENTER);
 
-        // 安全 hover 设置
         setupListHover();
 
-        // Bottom: controls
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         controls.setOpaque(false);
         JButton importBtn = createPrimaryButton("Import");
@@ -90,7 +86,6 @@ public class ManageQuizView extends JPanel {
         gbc.gridy = 0;
         add(card, gbc);
 
-        // Button actions
         importBtn.addActionListener(e -> {
             Window window = SwingUtilities.getWindowAncestor(this);
             JFrame parent = window instanceof JFrame ? (JFrame) window : null;
@@ -155,7 +150,6 @@ public class ManageQuizView extends JPanel {
         );
     }
 
-    // -------------------- Custom Buttons --------------------
     private static JButton baseButton(String text, Color bg, Color hoverBg, Color fg) {
         JButton b = new JButton(text) {
             @Override
@@ -200,7 +194,6 @@ public class ManageQuizView extends JPanel {
         return baseButton(text, SECONDARY, SECONDARY_HOVER, Color.WHITE);
     }
 
-    // -------------------- Custom List Renderer --------------------
     private void setupListHover() {
         listUI.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override

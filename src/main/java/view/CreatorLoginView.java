@@ -110,13 +110,11 @@ public class CreatorLoginView extends JPanel {
 
     private void setupViewModelListener() {
         viewModel.addPropertyChangeListener(evt -> {
-            // SUCCESS → navigate to manage screen
             if (viewModel.isLoginSuccess()) {
                 viewManagerModel.navigate("manage");
                 return;
             }
 
-            // FAILURE → show the popup
             if (viewModel.getErrorMessage() != null) {
                 JOptionPane.showMessageDialog(
                         this,
