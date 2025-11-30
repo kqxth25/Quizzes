@@ -83,4 +83,10 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
 
         presenter.presentPreviousQuestion(outputData);
     }
+
+    public void loadQuiz(String quizName) {
+        if (repository instanceof ImportedQuizRepositoryAdapter) {
+            ((ImportedQuizRepositoryAdapter) repository).loadQuiz(quizName);
+        }
+    }
 }
