@@ -15,45 +15,77 @@ public class QuizView extends JPanel implements PropertyChangeListener {
     private final QuizViewModel viewModel;
     private QuizController controller;
 
+    private static final Color BG_APP = new Color(243, 244, 246);
+    private static final Color TEXT_MAIN = new Color(30, 41, 59);
+    private static final Color TEXT_MUTED = new Color(100, 116, 139);
+    private static final Color PRIMARY = new Color(59, 130, 246);
+    private static final Color PRIMARY_HOVER = new Color(96, 165, 250);
+    private static final Color SECONDARY = new Color(148, 163, 184);
+    private static final Color SECONDARY_HOVER = new Color(148, 163, 184).brighter();
+
     private final JLabel progressLabel = new JLabel("Progress: 1/10");
     private final JLabel questionLabel = new JLabel("Question");
     private final JRadioButton[] options = new JRadioButton[4];
     private final ButtonGroup optionGroup = new ButtonGroup();
-    private final JButton previousButton = new JButton("Previous");
-    private final JButton nextButton = new JButton("Next");
+
+    private final JButton previousButton = createSecondaryButton("Previous");
+    private final JButton nextButton = createPrimaryButton("Next");
 
     public QuizView(QuizViewModel viewModel, Object viewManagerModel) {
         this.viewModel = viewModel;
         this.viewModel.addPropertyChangeListener(this);
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBackground(BG_APP);
+        setLayout(new GridBagLayout());
 
-        progressLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(progressLabel);
-        add(Box.createVerticalStrut(10));
+        JPanel card = new JPanel();
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        questionLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        add(questionLabel);
-        add(Box.createVerticalStrut(20));
+        progressLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        progressLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        progressLabel.setForeground(TEXT_MUTED);
+
+        questionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        questionLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        questionLabel.setForeground(TEXT_MAIN);
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setOpaque(false);
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 
         for (int i = 0; i < 4; i++) {
             options[i] = new JRadioButton("Option " + (i + 1));
+            options[i].setOpaque(false);
+            options[i].setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            options[i].setForeground(TEXT_MAIN);
             optionGroup.add(options[i]);
-            add(options[i]);
-            add(Box.createVerticalStrut(5));
+
+            optionsPanel.add(options[i]);
+            optionsPanel.add(Box.createVerticalStrut(4));
         }
 
-        add(Box.createVerticalStrut(20));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        buttonPanel.setOpaque(false);
         buttonPanel.add(previousButton);
         buttonPanel.add(nextButton);
-        add(buttonPanel);
+
+        card.add(progressLabel);
+        card.add(Box.createVerticalStrut(12));
+        card.add(questionLabel);
+        card.add(Box.createVerticalStrut(14));
+        card.add(optionsPanel);
+        card.add(Box.createVerticalStrut(18));
+        card.add(buttonPanel);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(card, gbc);
 
         nextButton.addActionListener(this::onNext);
         previousButton.addActionListener(this::onPrevious);
-
         previousButton.setEnabled(false);
     }
 
@@ -65,9 +97,7 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         if (controller == null) return;
 
         QuizState state = viewModel.getState();
-
         int selected = getSelectedOption();
-
 
         if ("Submit".equals(nextButton.getText())) {
             controller.submitAnswer(state.getCurrentQuestionIndex(), selected);
@@ -91,10 +121,12 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         QuizState state = viewModel.getState();
 
         if (!state.hasPrevious()) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                    this,
                     "You are at the first question.",
                     "Navigation Warning",
-                    JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE
+            );
             return;
         }
 
@@ -110,7 +142,12 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         int total = state.getTotalQuestions();
         progressLabel.setText("Progress: " + current + "/" + total);
 
-        questionLabel.setText(state.getQuestionText());
+        String qText = state.getQuestionText();
+        if (qText != null) {
+            questionLabel.setText("<html><body style='width:600px'>" + qText + "</body></html>");
+        } else {
+            questionLabel.setText("");
+        }
 
         optionGroup.clearSelection();
 
@@ -127,7 +164,7 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         }
 
         int savedAnswer = state.getAnswer(state.getCurrentQuestionIndex());
-        if (savedAnswer >= 0 && savedAnswer < opts.length) {
+        if (opts != null && savedAnswer >= 0 && savedAnswer < opts.length) {
             options[savedAnswer].setSelected(true);
         }
 
@@ -140,5 +177,52 @@ public class QuizView extends JPanel implements PropertyChangeListener {
 
         revalidate();
         repaint();
+    }
+
+    private static JButton baseButton(String text, Color bg, Color hoverBg, Color fg) {
+        JButton b = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                Color fill = getModel().isRollover() ? hoverBg : bg;
+                g2.setColor(fill);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+
+                g2.dispose();
+                super.paintComponent(g);
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(bg.darker());
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
+                g2.dispose();
+            }
+        };
+
+        b.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setContentAreaFilled(false);
+        b.setFocusPainted(false);
+        b.setBorder(BorderFactory.createEmptyBorder(8, 24, 8, 24));
+
+        b.setForeground(fg);
+        b.setPreferredSize(new Dimension(140, 38));
+        b.setMinimumSize(new Dimension(140, 38));
+        b.setMaximumSize(new Dimension(150, 38));
+
+        return b;
+    }
+
+    private static JButton createPrimaryButton(String text) {
+        return baseButton(text, PRIMARY, PRIMARY_HOVER, Color.WHITE);
+    }
+
+    private static JButton createSecondaryButton(String text) {
+        return baseButton(text, SECONDARY, SECONDARY_HOVER, Color.WHITE);
     }
 }
