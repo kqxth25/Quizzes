@@ -1,7 +1,7 @@
 package interface_adapter.signup;
 
-import use_case.signup.SignupInputBoundary;
-import use_case.signup.SignupInputData;
+import use_case.user_signup.SignupInputBoundary;
+import use_case.user_signup.SignupInputData;
 
 /**
  * Controller for the Signup Use Case.
