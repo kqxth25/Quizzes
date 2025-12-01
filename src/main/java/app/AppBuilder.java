@@ -8,6 +8,7 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.result.ResultState;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -93,11 +94,11 @@ public class AppBuilder {
 
         // (3) presenter
         interface_adapter.result.ResultPresenter presenter =
-                new interface_adapter.result.ResultPresenter(this.resultVm, showResult);
+                new interface_adapter.result.ResultPresenter(this.resultVm);
 
         // (4) interactor
         use_case.result.ResultInteractor interactor =
-                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter);
+                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter, this.quizViewModel);
 
         // (5) controller
         this.resultController =
@@ -226,8 +227,9 @@ public class AppBuilder {
 
         this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialState);
 
+
         interface_adapter.confirm_submit.ConfirmPresenter confirmPresenter =
-                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm);
+                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm, this.resultVm);
 
         use_case.quiz.QuizStateProvider provider =
                 new interface_adapter.quiz.QuizStateProviderImpl(this.quizViewModel, this.quizAnswerRepository);

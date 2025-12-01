@@ -18,7 +18,19 @@ public class ResultViewModel {
     public void setState(ResultState state) {
         ResultState old = this.state;
         this.state = state;
-        support.firePropertyChange("resultState", old, state);
+        support.firePropertyChange("resultState", old, this.state);
+    }
+
+    public void setScore(int score) {
+        ResultState old = this.state;
+        this.state.setScore(score);
+        support.firePropertyChange("resultState", old, this.state);
+    }
+
+    public void setTotal(int total) {
+        ResultState old = this.state;
+        this.state.setTotal(total);
+        support.firePropertyChange("resultState", old, this.state);
     }
 
     public void firePropertyChanged() {

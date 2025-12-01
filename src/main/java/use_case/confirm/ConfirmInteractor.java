@@ -46,12 +46,33 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
 
     @Override
     public void forceSubmit() {
-        // 1. 告诉 Presenter 用户强制提交了（这步会把 dialog 按钮更新为 "Confirm Submit"）
-        ConfirmResponseModel response = new ConfirmResponseModel(new ArrayList<>(), true);
-        presenter.presentConfirmation(response);
 
-        // 2. 然后正式跳转到 result
+        // === 1. 获取用户答案 ===
+        QuizState s = stateProvider.getQuizState();
+        int total = s.getTotalQuestions();
+
+        int correct = 0;
+
+        // === 2. 获取数据库中的正确答案 ===
+        // 你必须在 QuizState 中提供 correct answers
+        int[] correctAnswers = s.getCorrectAnswers();  // ★ 需要你确保 QuizState 有这个
+
+        // === 3. 对比用户答案与正确答案 ===
+        for (int i = 0; i < total; i++) {
+            if (s.getAnswer(i) == correctAnswers[i]) {
+                correct++;
+            }
+        }
+
+        // === 4. 计算得分百分比 ===
+        double scorePct = (double) correct / total * 100.0;
+
+        // === 5. 把分数传给 presenter（让 ResultViewModel 更新） ===
+        presenter.showFinalScore(scorePct);
+
+        // === 6. 跳转到 result view ===
         presenter.showResult();
     }
+
 
 }
