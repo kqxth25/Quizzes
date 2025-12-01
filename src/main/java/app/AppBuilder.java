@@ -39,6 +39,12 @@ import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
 
+import interface_adapter.history.HistoryController;
+import use_case.history.HistoryInputBoundary;
+import use_case.history.HistoryInteractor;
+import use_case.history.HistoryOutputBoundary;
+import interface_adapter.history.HistoryPresenter;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -67,15 +73,18 @@ public class AppBuilder {
     private QuizViewModel quizViewModel;
     private QuizController quizController;
     private QuizView quizView;
-
+    private HistoryView historyView;
     private ManageQuizView manageQuizView;
 
     private final ViewManager viewManager;
 
+    private HistoryController historyController;
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
         this.viewManager = new ViewManager(this.cardPanel, this.cardLayout, this.viewManagerModel);
+
+        addHistoryUseCase();
     }
 
     public AppBuilder addHomeView() {
@@ -85,9 +94,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginView() {
-        // create the ViewModel first
         this.creatorLoginViewModel = new CreatorLoginViewModel();
-        // pass the ViewModel into the CreatorLoginView so it can listen for updates
         this.creatorLoginView = new CreatorLoginView(this.viewManagerModel, this.creatorLoginViewModel);
         this.cardPanel.add(this.creatorLoginView, this.creatorLoginView.getViewName());
         return this;
@@ -113,7 +120,8 @@ public class AppBuilder {
                 this.selectQuizViewModel,
                 this.viewManagerModel,
                 this.quizViewModel,
-                this.quizController
+                this.quizController,
+                this.historyController
         );
         this.cardPanel.add(this.selectQuizView, this.selectQuizView.getViewName());
         return this;
@@ -122,6 +130,12 @@ public class AppBuilder {
     public AppBuilder addManageQuizView() {
         this.manageQuizView = new ManageQuizView(this.viewManagerModel, this.manageQuizRepository);
         this.cardPanel.add(this.manageQuizView, this.manageQuizView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addHistoryView() {
+        this.historyView = new HistoryView(this.viewManagerModel);
+        this.cardPanel.add(this.historyView, this.historyView.getViewName());
         return this;
     }
 
@@ -151,7 +165,6 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginUseCase() {
-        // Presenter should be created with the CreatorLoginViewModel so it can update the view model
         CreatorLoginOutputBoundary presenter =
                 new CreatorLoginPresenter(this.viewManagerModel, this.creatorLoginViewModel);
 
@@ -185,6 +198,15 @@ public class AppBuilder {
         return addSelectQuizUseCase();
     }
 
+    public AppBuilder addHistoryUseCase() {
+        HistoryOutputBoundary presenter = new HistoryPresenter(this.viewManagerModel);
+
+        HistoryInputBoundary interactor = new HistoryInteractor(presenter);
+
+        this.historyController = new HistoryController(interactor);
+
+        return this;
+    }
 
     public JFrame build() {
         final JFrame app = new JFrame("Quiz Application");
