@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class SelectQuizView extends JPanel implements ActionListener {
@@ -35,10 +36,16 @@ public class SelectQuizView extends JPanel implements ActionListener {
     private static final Color SECONDARY = new Color(148, 163, 184);
     private static final Color SECONDARY_HOVER = new Color(148, 163, 184).brighter();
 
+    private final JComboBox<String> categoryBox;
+    private final JComboBox<String> difficultyBox;
+    private final JComboBox<String> typeBox;
+
     private final JPanel quizListPanel = new JPanel();
     private final JButton backButton;
     private final JButton historyButton;
     private final JLabel statusLabel = new JLabel("");
+
+    private boolean categoriesInitialized = false;
 
     public SelectQuizView(SelectQuizViewModel viewModel,
                           ViewManagerModel nav,
@@ -70,7 +77,42 @@ public class SelectQuizView extends JPanel implements ActionListener {
         card.add(title);
         card.add(Box.createVerticalStrut(4));
         card.add(subtitle);
-        card.add(Box.createVerticalStrut(18));
+        card.add(Box.createVerticalStrut(12));
+
+        JPanel filterPanel = new JPanel();
+        filterPanel.setOpaque(false);
+        filterPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 0));
+
+        JLabel catLabel = new JLabel("Category:");
+        catLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        catLabel.setForeground(TEXT_MUTED);
+
+        categoryBox = new JComboBox<>(new String[]{"Any"});
+        categoryBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JLabel diffLabel = new JLabel("Difficulty:");
+        diffLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        diffLabel.setForeground(TEXT_MUTED);
+
+        difficultyBox = new JComboBox<>(new String[]{"Any", "easy", "medium", "hard"});
+        difficultyBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        typeLabel.setForeground(TEXT_MUTED);
+
+        typeBox = new JComboBox<>(new String[]{"Any", "multiple", "boolean"});
+        typeBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        filterPanel.add(catLabel);
+        filterPanel.add(categoryBox);
+        filterPanel.add(diffLabel);
+        filterPanel.add(difficultyBox);
+        filterPanel.add(typeLabel);
+        filterPanel.add(typeBox);
+
+        card.add(filterPanel);
+        card.add(Box.createVerticalStrut(8));
 
         quizListPanel.setLayout(new BoxLayout(quizListPanel, BoxLayout.Y_AXIS));
         quizListPanel.setOpaque(false);
@@ -108,6 +150,10 @@ public class SelectQuizView extends JPanel implements ActionListener {
         backButton.addActionListener(this);
         historyButton.addActionListener(this);
 
+        categoryBox.addActionListener(e -> refreshQuizzesWithFilters());
+        difficultyBox.addActionListener(e -> refreshQuizzesWithFilters());
+        typeBox.addActionListener(e -> refreshQuizzesWithFilters());
+
         this.viewModel.addPropertyChangeListener((PropertyChangeEvent evt) -> {
             if ("state".equals(evt.getPropertyName())) {
                 updateFromViewModel();
@@ -119,8 +165,8 @@ public class SelectQuizView extends JPanel implements ActionListener {
             if (newVal instanceof ViewManagerState) {
                 ViewManagerState state = (ViewManagerState) newVal;
                 String current = state.getActiveView();
-                if (viewName.equals(current) && controller != null) {
-                    controller.execute();
+                if (viewName.equals(current)) {
+                    refreshQuizzesWithFilters();
                 }
             }
         });
@@ -129,12 +175,31 @@ public class SelectQuizView extends JPanel implements ActionListener {
     public void setController(ListQuizzesController controller) {
         this.controller = controller;
         if (this.controller != null) {
-            this.controller.execute();
+            refreshQuizzesWithFilters();
         }
     }
 
     public void updateFromViewModel() {
         List<QuizItemDto> quizzes = viewModel.getQuizzes();
+
+        java.util.LinkedHashSet<String> cats = new java.util.LinkedHashSet<>();
+        cats.add("Any");
+        if (quizzes != null) {
+            for (QuizItemDto q : quizzes) {
+                String c = q.getCategory();
+                if (c != null && !c.isBlank()) {
+                    cats.add(c);
+                }
+            }
+        }
+        String prevSelection = (String) categoryBox.getSelectedItem();
+        categoryBox.setModel(new DefaultComboBoxModel<>(cats.toArray(new String[0])));
+        if (prevSelection != null && cats.contains(prevSelection)) {
+            categoryBox.setSelectedItem(prevSelection);
+        } else {
+            categoryBox.setSelectedItem("Any");
+        }
+
         quizListPanel.removeAll();
 
         if (quizzes == null || quizzes.isEmpty()) {
@@ -157,6 +222,7 @@ public class SelectQuizView extends JPanel implements ActionListener {
 
                 JLabel info = new JLabel(
                         item.getTitle() + "  ·  " +
+                                item.getCategory() + "  ·  " +
                                 item.getDifficulty() + "  ·  " +
                                 item.getType()
                 );
@@ -184,14 +250,21 @@ public class SelectQuizView extends JPanel implements ActionListener {
 
     private void onQuizSelected(QuizItemDto quiz) {
         String quizName = quiz.getTitle();
-
         quizController.loadQuiz(quizName);
-
         QuizState initialState = new QuizState(10);
         quizViewModel.setState(initialState);
-
         quizController.next(-1, -1);
         nav.navigate("quiz");
+    }
+
+    private void refreshQuizzesWithFilters() {
+        if (controller == null) return;
+
+        String category = (String) categoryBox.getSelectedItem();
+        String difficulty = (String) difficultyBox.getSelectedItem();
+        String type = (String) typeBox.getSelectedItem();
+
+        controller.execute(category, difficulty, type);
     }
 
     @Override
@@ -214,11 +287,9 @@ public class SelectQuizView extends JPanel implements ActionListener {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 Color fill = getModel().isRollover() ? hoverBg : bg;
                 g2.setColor(fill);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
-
                 g2.dispose();
                 super.paintComponent(g);
             }
@@ -238,12 +309,10 @@ public class SelectQuizView extends JPanel implements ActionListener {
         b.setContentAreaFilled(false);
         b.setFocusPainted(false);
         b.setBorder(BorderFactory.createEmptyBorder(8, 24, 8, 24));
-
         b.setForeground(fg);
         b.setPreferredSize(new Dimension(140, 38));
         b.setMinimumSize(new Dimension(120, 34));
         b.setMaximumSize(new Dimension(160, 40));
-
         return b;
     }
 
