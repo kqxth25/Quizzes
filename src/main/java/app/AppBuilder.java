@@ -72,11 +72,51 @@ public class AppBuilder {
     private QuizViewModel quizViewModel;
     private QuizController quizController;
     private QuizView quizView;
+    private use_case.quiz.QuizRepository_answer quizAnswerRepository;
+
     private HistoryView historyView;
     private ManageQuizView manageQuizView;
 
     private final ViewManager viewManager;
 
+    // ----------- CONFIRM SUBMIT FEATURE (created later) -----------
+    private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
+    private interface_adapter.confirm_submit.ConfirmController confirmController;
+    // -------------------------------------------------------------
+// ================= RESULT FEATURE =================
+    private interface_adapter.result.ResultViewModel resultVm;
+    private interface_adapter.result.ResultController resultController;
+
+    public AppBuilder addResultFeature() {
+
+        // (1) view model
+        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
+
+        // (2) callback: navigate to "resultView"
+        Runnable showResult = () -> {
+            this.viewManagerModel.navigate("resultView");
+        };
+
+        // (3) presenter
+        interface_adapter.result.ResultPresenter presenter =
+                new interface_adapter.result.ResultPresenter(this.resultVm, showResult);
+
+        // (4) interactor
+        use_case.result.ResultInteractor interactor =
+                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter);
+
+        // (5) controller
+        this.resultController =
+                new interface_adapter.result.ResultController(interactor);
+
+        // (6) Result View (card layout)
+        view.ResultView resultView =
+                new view.ResultView(resultVm, this.viewManagerModel);
+
+        this.cardPanel.add(resultView, "resultView");
+
+        return this;
+    }
     private HistoryController historyController;
 
     public AppBuilder() {
@@ -166,23 +206,20 @@ public class AppBuilder {
     public AppBuilder addCreatorLoginUseCase() {
         CreatorLoginOutputBoundary presenter =
                 new CreatorLoginPresenter(this.viewManagerModel, this.creatorLoginViewModel);
-
         CreatorLoginInputBoundary interactor =
                 new CreatorLoginInteractor(presenter);
-
         CreatorLoginController controller =
                 new CreatorLoginController(interactor);
-
         this.creatorLoginView.setController(controller);
-
         return this;
     }
+
     public AppBuilder addQuizView() {
-        QuizRepository_answer repository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
+        this.quizAnswerRepository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
 
         this.quizViewModel = new QuizViewModel(new QuizState(10));
         QuizPresenter presenter = new QuizPresenter(this.quizViewModel);
-        AnswerQuizInputBoundary interactor = new AnswerQuizInteractor(presenter, repository);
+        AnswerQuizInputBoundary interactor = new AnswerQuizInteractor(presenter, this.quizAnswerRepository);
         this.quizController = new QuizController(interactor);
 
         this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
@@ -192,11 +229,43 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addSelectQuizUseCase(ListQuizzesDataAccessInterface externalQuizDao) {
-        this.quizDao = externalQuizDao;
-        return addSelectQuizUseCase();
+    // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
+    public AppBuilder addConfirmSubmitFeature(JFrame app) {
+
+        interface_adapter.confirm_submit.ConfirmState initialState =
+                new interface_adapter.confirm_submit.ConfirmState(
+                        java.util.Collections.emptyList(),
+                        false,
+                        "",
+                        "Confirm Submit"
+                );
+
+        this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialState);
+
+        interface_adapter.confirm_submit.ConfirmPresenter confirmPresenter =
+                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm);
+
+        use_case.quiz.QuizStateProvider provider =
+                new interface_adapter.quiz.QuizStateProviderImpl(this.quizViewModel, this.quizAnswerRepository);
+
+        use_case.confirm.ConfirmInteractor confirmInteractor =
+                new use_case.confirm.ConfirmInteractor(provider, confirmPresenter);
+
+        this.confirmController =
+                new interface_adapter.confirm_submit.ConfirmController(confirmInteractor);
+
+
+        view.ConfirmDialog confirmDialog =
+                new view.ConfirmDialog(app, this.confirmVm, this.confirmController);
+
+        this.confirmController.setConfirmDialog(confirmDialog);
+
+        this.quizController.setConfirmController(this.confirmController);
+
+        return this;
     }
 
+    // -------------------------------------------------------------------------------------------
     public AppBuilder addHistoryUseCase() {
         HistoryOutputBoundary presenter = new HistoryPresenter(this.viewManagerModel);
 
@@ -217,6 +286,13 @@ public class AppBuilder {
         if (this.homeView != null) {
             this.viewManagerModel.navigate(this.homeView.getViewName());
         }
+
+        // MUST: create result feature before confirm submit
+        this.addResultFeature();
+
+        // confirm submit depends on result controller
+        this.addConfirmSubmitFeature(app);
+
         return app;
     }
 }

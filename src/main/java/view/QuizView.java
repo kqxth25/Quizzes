@@ -100,7 +100,7 @@ public class QuizView extends JPanel implements PropertyChangeListener {
         int selected = getSelectedOption();
 
         if ("Submit".equals(nextButton.getText())) {
-            controller.submitAnswer(state.getCurrentQuestionIndex(), selected);
+            controller.prepareConfirmation(state.getCurrentQuestionIndex(), selected);
         } else {
             controller.next(state.getCurrentQuestionIndex(), selected);
         }

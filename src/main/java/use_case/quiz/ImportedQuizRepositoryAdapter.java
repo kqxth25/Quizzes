@@ -21,6 +21,7 @@ public class ImportedQuizRepositoryAdapter implements QuizRepository_answer {
         this.correctAnswers = new int[0];
     }
 
+    @Override
     public void loadQuiz(String quizName) {
         Quiz quiz = importRepository.getByName(quizName);
 
@@ -41,13 +42,16 @@ public class ImportedQuizRepositoryAdapter implements QuizRepository_answer {
         for (int i = 0; i < size; i++) {
             Question q = questionList.get(i);
 
+            // question text
             this.questions[i][0] = q.getQuestionText();
 
+            // options: correct answer first, then incorrect answers
             List<String> allOptions = new ArrayList<>();
             allOptions.add(q.getCorrectAnswer());
             allOptions.addAll(q.getIncorrectAnswers());
             this.options[i] = allOptions.toArray(new String[0]);
 
+            // correct answer index is always 0 here
             this.correctAnswers[i] = 0;
         }
     }
@@ -70,4 +74,16 @@ public class ImportedQuizRepositoryAdapter implements QuizRepository_answer {
     public int[] getCorrectAnswers() {
         return correctAnswers;
     }
+
+    // Imported quizzes do not have saved answers (user answers)
+    @Override
+    public int[] getSavedAnswers() {
+        return new int[0];
+    }
+
+    @Override
+    public void saveAnswer(int questionIndex, int answerIndex) {
+        // imported quizzes do not store answers
+    }
+
 }
