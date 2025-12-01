@@ -7,6 +7,7 @@ import interface_adapter.quiz.QuizState;
 import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.selectquiz.ListQuizzesController;
 import interface_adapter.selectquiz.SelectQuizViewModel;
+import interface_adapter.history.HistoryController;
 import use_case.selectquiz.QuizItemDto;
 
 import javax.swing.*;
@@ -24,6 +25,7 @@ public class SelectQuizView extends JPanel implements ActionListener {
     private final ViewManagerModel nav;
     private final QuizViewModel quizViewModel;
     private final QuizController quizController;
+    private final HistoryController historyController;
 
     private ListQuizzesController controller;
 
@@ -43,11 +45,14 @@ public class SelectQuizView extends JPanel implements ActionListener {
     public SelectQuizView(SelectQuizViewModel viewModel,
                           ViewManagerModel nav,
                           QuizViewModel quizViewModel,
-                          QuizController quizController) {
+                          QuizController quizController,
+                          HistoryController historyController) {
+
         this.viewModel = viewModel;
         this.nav = nav;
         this.quizViewModel = quizViewModel;
         this.quizController = quizController;
+        this.historyController = historyController;
 
         setBackground(BG_APP);
         setLayout(new GridBagLayout());
@@ -200,7 +205,7 @@ public class SelectQuizView extends JPanel implements ActionListener {
         if (src == backButton) {
             nav.navigate("home");
         } else if (src == historyButton) {
-            nav.navigate("history");
+            historyController.onHistorySelected();
         }
     }
 

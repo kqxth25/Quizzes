@@ -19,6 +19,7 @@ public class Main {
                         .addLoginUseCase()
                         .addSelectQuizUseCase()
                         .addCreatorLoginUseCase()
+                        .addHistoryView()
                         .build();
                 app.setVisible(true);
             }
