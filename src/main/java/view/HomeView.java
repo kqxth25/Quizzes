@@ -34,7 +34,7 @@ public class HomeView extends JPanel {
         card.setBorder(BorderFactory.createEmptyBorder(32, 40, 32, 40));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        JLabel title = new JLabel("Welcome!", SwingConstants.CENTER);
+        JLabel title = new JLabel("Welcome to Trivial Quiz!", SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setFont(new Font("Segoe UI", Font.BOLD, 28));
         title.setForeground(TEXT_MAIN);
