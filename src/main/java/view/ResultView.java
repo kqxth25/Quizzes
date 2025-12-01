@@ -1,70 +1,66 @@
 package view;
 
+import interface_adapter.result.ResultViewModel;
+import interface_adapter.result.ResultState;
+
+import interface_adapter.ViewManagerModel;
+
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class ResultView extends JFrame {
+public class ResultView extends JPanel implements PropertyChangeListener {
 
-    public ResultView(int score) {
-        setTitle("Quiz Result");
-        setSize(400, 250);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(20, 20));
-        getContentPane().setBackground(new Color(245, 245, 245));
+    private final ResultViewModel viewModel;
+    private final ViewManagerModel viewManagerModel;
 
-        JLabel scoreLabel = new JLabel("You got " + score + "% of the quiz!", SwingConstants.CENTER);
-        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+    private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
+
+    public ResultView(ResultViewModel viewModel, ViewManagerModel viewManagerModel) {
+        this.viewModel = viewModel;
+        this.viewManagerModel = viewManagerModel;
+
+        this.viewModel.addPropertyChangeListener(this);
+
+        setLayout(new BorderLayout(16, 16));
+        setBackground(new Color(245, 245, 245));
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
+
+        scoreLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         scoreLabel.setOpaque(true);
-        scoreLabel.setBackground(new Color(220, 220, 220));
-        scoreLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        scoreLabel.setBackground(new Color(255, 255, 255));
+        scoreLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         add(scoreLabel, BorderLayout.CENTER);
 
-        JPanel btnPanel = new JPanel(new FlowLayout());
-        btnPanel.setBackground(new Color(245, 245, 245));
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
+        bottom.setOpaque(false);
 
-        JButton detailBtn = new JButton("See Detail");
-        JButton shareBtn = new JButton("Share Result");
+        JButton backBtn = new JButton("Back to Home");
+        backBtn.addActionListener(e -> viewManagerModel.navigate("home"));
+        bottom.add(backBtn);
 
-        styleButton(detailBtn, new Color(0, 102, 204));
-        styleButton(shareBtn, new Color(0, 102, 204));
+        add(bottom, BorderLayout.SOUTH);
 
-        btnPanel.add(detailBtn);
-        btnPanel.add(shareBtn);
-        add(btnPanel, BorderLayout.SOUTH);
-
-        detailBtn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Details not implemented."));
-
-        shareBtn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Shared! Score = " + score + "%"));
-
-        setVisible(true);
+        // show initial state if available
+        updateFromState(viewModel.getState());
     }
 
-    private void styleButton(JButton btn, Color bgColor) {
-        btn.setFont(new Font("SansSerif", Font.BOLD, 16));
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        btn.setOpaque(true);
-        btn.setContentAreaFilled(true);
-        btn.setBackground(bgColor);
-
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(bgColor.darker().darker());
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(bgColor);
-            }
-        });
+    private void updateFromState(ResultState state) {
+        if (state == null) {
+            scoreLabel.setText("No result");
+        } else {
+            scoreLabel.setText("You got " + state.getScore() + "%");
+        }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ResultView(87));
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        ResultState s = (ResultState) evt.getNewValue();
+        if (s != null) {
+            updateFromState(s);
+            revalidate();
+            repaint();
+        }
     }
 }
-
-

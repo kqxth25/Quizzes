@@ -8,8 +8,7 @@ import java.util.List;
 
 /**
  * Interactor that inspects the current QuizState (via provider) and creates a response for presenter.
- * Also handles 'force submit' action (here we simply forward a 'force submit' event to presenter by sending an empty list and allCompleted=false;
- * in a real system you would call the submit use-case).
+ * Also handles 'force submit' action.
  */
 public class ConfirmInteractor implements ConfirmInputBoundary {
 
@@ -27,14 +26,15 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
         int total = s.getTotalQuestions();
         List<Integer> incomplete = new ArrayList<>();
 
+        // 正常统计所有未完成题目
         for (int i = 0; i < total; i++) {
-            int ans = s.getAnswer(i); // your QuizState has getAnswer(index)
+            int ans = s.getAnswer(i);
             if (ans < 0) {
                 incomplete.add(i);
             }
         }
 
-        // ⬇⬇⬇ 在这里忽略 Q10（index = 9）未完成 ⬇⬇⬇
+        // 规则：不显示第10题（index = 9）
         incomplete.remove(Integer.valueOf(9));
 
         boolean allCompleted = incomplete.isEmpty();
@@ -43,14 +43,15 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
     }
 
 
+
     @Override
     public void forceSubmit() {
-        // In a full system this would trigger the actual submission use case.
-        // For our confirm flow, we can reuse presenter to update UI to a "forcing" state.
-        // We'll present a response with an empty list but mark allCompleted=false to indicate forced submission.
-        ConfirmResponseModel response = new ConfirmResponseModel(new ArrayList<>(), false);
+        // 1. 告诉 Presenter 用户强制提交了（这步会把 dialog 按钮更新为 "Confirm Submit"）
+        ConfirmResponseModel response = new ConfirmResponseModel(new ArrayList<>(), true);
         presenter.presentConfirmation(response);
 
-        // TODO: call the actual submit interactor if you have one (e.g. AnswerQuizInputBoundary.submitFinal())
+        // 2. 然后正式跳转到 result
+        presenter.showResult();
     }
+
 }

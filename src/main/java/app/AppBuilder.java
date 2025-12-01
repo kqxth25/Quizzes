@@ -77,6 +77,40 @@ public class AppBuilder {
     private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
     private interface_adapter.confirm_submit.ConfirmController confirmController;
     // -------------------------------------------------------------
+// ================= RESULT FEATURE =================
+    private interface_adapter.result.ResultViewModel resultVm;
+    private interface_adapter.result.ResultController resultController;
+
+    public AppBuilder addResultFeature() {
+
+        // (1) view model
+        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
+
+        // (2) callback: navigate to "resultView"
+        Runnable showResult = () -> {
+            this.viewManagerModel.navigate("resultView");
+        };
+
+        // (3) presenter
+        interface_adapter.result.ResultPresenter presenter =
+                new interface_adapter.result.ResultPresenter(this.resultVm, showResult);
+
+        // (4) interactor
+        use_case.result.ResultInteractor interactor =
+                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter);
+
+        // (5) controller
+        this.resultController =
+                new interface_adapter.result.ResultController(interactor);
+
+        // (6) Result View (card layout)
+        view.ResultView resultView =
+                new view.ResultView(resultVm, this.viewManagerModel);
+
+        this.cardPanel.add(resultView, "resultView");
+
+        return this;
+    }
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
@@ -182,7 +216,7 @@ public class AppBuilder {
     // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
     public AppBuilder addConfirmSubmitFeature(JFrame app) {
 
-        interface_adapter.confirm_submit.ConfirmState initialConfirmState =
+        interface_adapter.confirm_submit.ConfirmState initialState =
                 new interface_adapter.confirm_submit.ConfirmState(
                         java.util.Collections.emptyList(),
                         false,
@@ -190,10 +224,10 @@ public class AppBuilder {
                         "Confirm Submit"
                 );
 
-        this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialConfirmState);
+        this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialState);
 
         interface_adapter.confirm_submit.ConfirmPresenter confirmPresenter =
-                new interface_adapter.confirm_submit.ConfirmPresenter(this.confirmVm);
+                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm);
 
         use_case.quiz.QuizStateProvider provider =
                 new interface_adapter.quiz.QuizStateProviderImpl(this.quizViewModel, this.quizAnswerRepository);
@@ -204,15 +238,17 @@ public class AppBuilder {
         this.confirmController =
                 new interface_adapter.confirm_submit.ConfirmController(confirmInteractor);
 
-        this.quizController.setConfirmController(this.confirmController);
 
         view.ConfirmDialog confirmDialog =
                 new view.ConfirmDialog(app, this.confirmVm, this.confirmController);
 
         this.confirmController.setConfirmDialog(confirmDialog);
 
+        this.quizController.setConfirmController(this.confirmController);
+
         return this;
     }
+
     // -------------------------------------------------------------------------------------------
 
     public JFrame build() {
@@ -226,9 +262,13 @@ public class AppBuilder {
             this.viewManagerModel.navigate(this.homeView.getViewName());
         }
 
-        // important: build confirm submit feature after quiz is created
+        // MUST: create result feature before confirm submit
+        this.addResultFeature();
+
+        // confirm submit depends on result controller
         this.addConfirmSubmitFeature(app);
 
         return app;
     }
+
 }
