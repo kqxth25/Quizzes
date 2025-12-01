@@ -1,8 +1,8 @@
 package app;
 
-import data_access.InMemoryQuizRepository;
-import data_access.InMemoryUserDataAccessObject;
-import data_access.InMemoryQuizDataAccess;
+import data_access.FileQuizRepository;
+import data_access.FileUserDataAccessObject;
+import interface_adapter.selectquiz.QuizListDataAccessAdapter;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginController;
@@ -34,10 +34,15 @@ import interface_adapter.quiz.QuizController;
 import interface_adapter.quiz.QuizPresenter;
 import interface_adapter.quiz.QuizViewModel;
 import interface_adapter.quiz.QuizState;
-import use_case.quiz.LocalQuizRepositoryAnswer;
 import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
+
+import interface_adapter.history.HistoryController;
+import use_case.history.HistoryInputBoundary;
+import use_case.history.HistoryInteractor;
+import use_case.history.HistoryOutputBoundary;
+import interface_adapter.history.HistoryPresenter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,10 +53,10 @@ public class AppBuilder {
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final UserFactory userFactory = new UserFactory();
-    private final InMemoryUserDataAccessObject userDao = new InMemoryUserDataAccessObject();
+    private final FileUserDataAccessObject userDao = new FileUserDataAccessObject("users.csv", userFactory);
 
-    private final QuizRepository_import manageQuizRepository = new InMemoryQuizRepository();
-    private ListQuizzesDataAccessInterface quizDao = new InMemoryQuizDataAccess(manageQuizRepository);
+    private final QuizRepository_import manageQuizRepository = new FileQuizRepository("quizzes.csv");
+    private ListQuizzesDataAccessInterface quizDao = new QuizListDataAccessAdapter(manageQuizRepository);
 
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -69,6 +74,7 @@ public class AppBuilder {
     private QuizView quizView;
     private use_case.quiz.QuizRepository_answer quizAnswerRepository;
 
+    private HistoryView historyView;
     private ManageQuizView manageQuizView;
 
     private final ViewManager viewManager;
@@ -111,10 +117,13 @@ public class AppBuilder {
 
         return this;
     }
+    private HistoryController historyController;
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
         this.viewManager = new ViewManager(this.cardPanel, this.cardLayout, this.viewManagerModel);
+
+        addHistoryUseCase();
     }
 
     public AppBuilder addHomeView() {
@@ -150,7 +159,8 @@ public class AppBuilder {
                 this.selectQuizViewModel,
                 this.viewManagerModel,
                 this.quizViewModel,
-                this.quizController
+                this.quizController,
+                this.historyController
         );
         this.cardPanel.add(this.selectQuizView, this.selectQuizView.getViewName());
         return this;
@@ -159,6 +169,12 @@ public class AppBuilder {
     public AppBuilder addManageQuizView() {
         this.manageQuizView = new ManageQuizView(this.viewManagerModel, this.manageQuizRepository);
         this.cardPanel.add(this.manageQuizView, this.manageQuizView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addHistoryView() {
+        this.historyView = new HistoryView(this.viewManagerModel);
+        this.cardPanel.add(this.historyView, this.historyView.getViewName());
         return this;
     }
 
@@ -250,6 +266,15 @@ public class AppBuilder {
     }
 
     // -------------------------------------------------------------------------------------------
+    public AppBuilder addHistoryUseCase() {
+        HistoryOutputBoundary presenter = new HistoryPresenter(this.viewManagerModel);
+
+        HistoryInputBoundary interactor = new HistoryInteractor(presenter);
+
+        this.historyController = new HistoryController(interactor);
+
+        return this;
+    }
 
     public JFrame build() {
         final JFrame app = new JFrame("Quiz Application");
@@ -270,5 +295,4 @@ public class AppBuilder {
 
         return app;
     }
-
 }

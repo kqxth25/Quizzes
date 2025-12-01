@@ -1,5 +1,6 @@
+package use_case.quiz;
+
 import org.junit.jupiter.api.Test;
-import use_case.quiz.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
