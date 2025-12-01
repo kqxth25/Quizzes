@@ -23,12 +23,10 @@ public class ResultView extends JPanel implements PropertyChangeListener {
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
     private final ShareResultController shareResultcontroller;
 
-    // New buttons
     private JButton shareBtn;
     private JButton detailBtn;
     private JButton backBtn;
 
-    // Colors copied from SignupView
     private static final Color BG_APP = new Color(243, 244, 246);
     private static final Color TEXT_MAIN = new Color(30, 41, 59);
     private static final Color PRIMARY = new Color(59, 130, 246);
@@ -46,7 +44,6 @@ public class ResultView extends JPanel implements PropertyChangeListener {
         setBackground(BG_APP);
         setLayout(new GridBagLayout());
 
-        // ===== Card Panel =====
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createEmptyBorder(32, 40, 32, 40));
@@ -60,7 +57,6 @@ public class ResultView extends JPanel implements PropertyChangeListener {
         card.add(scoreLabel);
         card.add(Box.createVerticalStrut(20));
 
-        // ===== Buttons Panel =====
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         buttons.setOpaque(false);
 
@@ -96,20 +92,15 @@ public class ResultView extends JPanel implements PropertyChangeListener {
     public void setDetailController(DetailController controller) {
         this.detailController = controller;
 
-        // remove previous listeners (optional), then add new one
-        // make sure detailBtn was created in constructor before this setter is called
         if (detailBtn != null) {
-            // clear existing listeners to avoid duplicate actions
             for (java.awt.event.ActionListener al : detailBtn.getActionListeners()) {
                 detailBtn.removeActionListener(al);
             }
 
             detailBtn.addActionListener(e -> {
                 if (this.detailController != null) {
-                    // ask controller to prepare/present detail data
                     this.detailController.showDetail();
                 }
-                // navigate to detail view (AppBuilder has already added detailView to cardPanel)
                 this.viewManagerModel.navigate("detailView");
             });
         } else {
@@ -134,7 +125,6 @@ public class ResultView extends JPanel implements PropertyChangeListener {
         }
     }
 
-    // ===== UI Components borrowed from SignupView =====
 
     private static JButton baseButton(String text, Color bg, Color hoverBg, Color fg) {
         JButton b = new JButton(text) {

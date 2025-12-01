@@ -55,7 +55,7 @@ public class ImportSuccessDialog extends JDialog {
 
         add(card, BorderLayout.CENTER);
 
-        setUndecorated(true); // Makes it a clean card dialog
+        setUndecorated(true);
         getRootPane().setBorder(BorderFactory.createLineBorder(new Color(203, 213, 225), 1));
         setVisible(true);
     }

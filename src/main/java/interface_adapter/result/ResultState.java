@@ -1,9 +1,8 @@
 package interface_adapter.result;
 
 public class ResultState {
-    // 改成 double 可以保存带小数的百分比
     private double score;
-    private int total; // 如果你还要展示总题数
+    private int total;
 
     public ResultState() {
         this.score = 0.0;

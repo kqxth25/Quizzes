@@ -14,7 +14,6 @@ public class ConfirmPresenter implements ConfirmOutputBoundary {
     private final ViewManagerModel viewManagerModel;
     private final ConfirmViewModel viewModel;
 
-    // 新增：注入 ResultViewModel，让 ConfirmPresenter 能直接更新 result 的 view model
     private final ResultViewModel resultViewModel;
 
     public ConfirmPresenter(ViewManagerModel viewManagerModel,
@@ -53,10 +52,8 @@ public class ConfirmPresenter implements ConfirmOutputBoundary {
         viewModel.setState(state);
     }
 
-    // 确保 ConfirmOutputBoundary 中有这个方法签名（void showFinalScore(double)）
     @Override
     public void showFinalScore(double scorePct) {
-        // 从 resultViewModel 取得当前 state，更新 score 后再 setState/firePropertyChanged
         ResultState s = resultViewModel.getState();
         if (s == null) {
             s = new ResultState();

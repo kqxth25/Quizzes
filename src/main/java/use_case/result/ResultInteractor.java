@@ -21,21 +21,18 @@ public class ResultInteractor implements ResultInputBoundary {
     @Override
     public void computeResult() {
 
-        // 获取用户答案与正确答案
         int[] user = repository.getSavedAnswers();
         int[] correct = repository.getCorrectAnswers();
 
         int score = 0;
         int total = correct.length;
 
-        // 计算分数
         for (int i = 0; i < total; i++) {
             if (user[i] == correct[i]) {
                 score++;
             }
         }
 
-        // 转给 presenter
         ResultResponseModel response = new ResultResponseModel(score, total);
         presenter.presentResult(response);
     }

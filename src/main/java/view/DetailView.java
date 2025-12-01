@@ -32,14 +32,12 @@ public class DetailView extends JPanel implements PropertyChangeListener {
         setLayout(new BorderLayout());
         setBackground(BG_APP);
 
-        // ----- Title -----
         JLabel title = new JLabel("Detail Result", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
         title.setForeground(TEXT_MAIN);
         title.setBorder(BorderFactory.createEmptyBorder(24, 0, 12, 0));
         add(title, BorderLayout.NORTH);
 
-        // ----- List area -----
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(BG_APP);
@@ -53,7 +51,6 @@ public class DetailView extends JPanel implements PropertyChangeListener {
 
         add(scroll, BorderLayout.CENTER);
 
-        // ----- Back button -----
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottom.setOpaque(false);
         JButton back = styledButton("Back");
@@ -63,7 +60,6 @@ public class DetailView extends JPanel implements PropertyChangeListener {
         add(bottom, BorderLayout.SOUTH);
     }
 
-    // Styled button consistent with LoginView
     private JButton styledButton(String text) {
         JButton b = new JButton(text) {
             @Override
@@ -176,7 +172,6 @@ public class DetailView extends JPanel implements PropertyChangeListener {
         rebuildFromState(state);
     }
 
-    // Modern minimal scrollbar UI
     private static class ModernScrollBarUI extends javax.swing.plaf.basic.BasicScrollBarUI {
         @Override
         protected void configureScrollBarColors() {

@@ -10,7 +10,6 @@ public class DetailPresenter implements DetailOutputBoundary {
 
     @Override
     public void presentDetail(use_case.result_detail.DetailResponseModel response) {
-        // convert to state and push to view model
         DetailState s = new DetailState(response.questions, response.options, response.correctIndex, response.savedAnswers);
         vm.setState(s);
     }

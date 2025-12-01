@@ -18,7 +18,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
     private final JLabel hintLabel = new JLabel(
             "please screenshot this page and send to your instructor");
 
-    // ---- Colors (Copied style from LoginView) ----
     private static final Color BG_APP = new Color(243, 244, 246);
     private static final Color TEXT_MAIN = new Color(30, 41, 59);
     private static final Color TEXT_MUTED = new Color(100, 116, 139);
@@ -28,14 +27,12 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
         this.viewModel.addPropertyChangeListener(this);
 
         setBackground(BG_APP);
-        setLayout(new GridBagLayout()); // center card like LoginView
+        setLayout(new GridBagLayout());
 
-        // === Card container ===
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // subtle shadow
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setColor(new Color(0, 0, 0, 30));
                 g2.fillRoundRect(5, 5, getWidth() - 10, getHeight() - 10, 20, 20);
@@ -46,7 +43,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createEmptyBorder(32, 48, 32, 48));
 
-        // === Title ===
         JLabel title = new JLabel("Share Result");
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
         title.setForeground(TEXT_MAIN);
@@ -57,7 +53,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
         subtitle.setForeground(TEXT_MUTED);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // === User info labels style ===
         Font infoFont = new Font("Segoe UI", Font.PLAIN, 17);
         usernameLabel.setFont(infoFont);
         quizLabel.setFont(infoFont);
@@ -71,7 +66,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
         quizLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // === Add components into card ===
         card.add(title);
         card.add(Box.createVerticalStrut(4));
         card.add(subtitle);
@@ -84,7 +78,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
         card.add(scoreLabel);
         card.add(Box.createVerticalStrut(20));
 
-        // === Bottom hint ===
         hintLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         hintLabel.setForeground(TEXT_MUTED);
         hintLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -95,7 +88,6 @@ public class ShareResultView extends JPanel implements PropertyChangeListener {
 
         card.add(hintPanel);
 
-        // center card like LoginView
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;

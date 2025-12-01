@@ -40,7 +40,6 @@ import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
 
-// 新增 detail imports (interface_adapter + use_case package names)
 import interface_adapter.result_detail.DetailViewModel;
 import interface_adapter.result_detail.DetailPresenter;
 import interface_adapter.result_detail.DetailController;
@@ -80,12 +79,9 @@ public class AppBuilder {
 
     private final ViewManager viewManager;
 
-    // ----------- CONFIRM SUBMIT FEATURE (created later) -----------
     private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
     private interface_adapter.confirm_submit.ConfirmController confirmController;
-    // -------------------------------------------------------------
 
-    // ================= RESULT FEATURE =================
     private interface_adapter.result.ResultViewModel resultVm;
     private interface_adapter.result.ResultController resultController;
 
@@ -176,7 +172,6 @@ public class AppBuilder {
     }
 
     public AppBuilder addQuizView() {
-        // quizAnswerRepository is the adapter over the imported repository
         this.quizAnswerRepository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
 
         this.quizViewModel = new QuizViewModel(new QuizState(10));
@@ -193,7 +188,6 @@ public class AppBuilder {
 
     public AppBuilder addResultFeature() {
 
-        // (1) Result VM / presenter / interactor / controller
         this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
         interface_adapter.result.ResultPresenter resultPresenter =
                 new interface_adapter.result.ResultPresenter(this.resultVm);
@@ -201,9 +195,6 @@ public class AppBuilder {
                 new use_case.result.ResultInteractor(this.quizAnswerRepository, resultPresenter, this.quizViewModel);
         this.resultController = new interface_adapter.result.ResultController(resultInteractor);
 
-        // ---------------------------
-        // Share Result wiring first (we need shareController for ResultView)
-        // ---------------------------
         interface_adapter.share_result.ShareResultViewModel shareVm =
                 new interface_adapter.share_result.ShareResultViewModel();
 
@@ -218,17 +209,11 @@ public class AppBuilder {
         view.ShareResultView shareView = new view.ShareResultView(shareVm);
         this.cardPanel.add(shareView, "share result");
 
-        // ---------------------------
-        // Now create ResultView with 3 parameters
-        // ---------------------------
         view.ResultView resultView =
                 new view.ResultView(this.resultVm, this.viewManagerModel, shareController);
 
         this.cardPanel.add(resultView, "resultView");
 
-        // ---------------------------
-        // Detail wiring
-        // ---------------------------
         DetailViewModel detailVm = new DetailViewModel(
                 new interface_adapter.result_detail.DetailState(new String[0], new String[0][], new int[0], new int[0])
         );
@@ -239,17 +224,14 @@ public class AppBuilder {
         view.DetailView detailView = new view.DetailView(detailVm, this.viewManagerModel);
         this.cardPanel.add(detailView, "detailView");
 
-        // inject detail controller (your ResultView must have setDetailController)
         resultView.setDetailController(detailController);
 
-        // inject share controller (your ResultView must have setShareController)
         resultView.setShareController(shareController);
 
         return this;
     }
 
 
-    // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
     public AppBuilder addConfirmSubmitFeature(JFrame app) {
 
         interface_adapter.confirm_submit.ConfirmState initialState =
@@ -286,7 +268,6 @@ public class AppBuilder {
         return this;
     }
 
-    // -------------------------------------------------------------------------------------------
 
     public JFrame build() {
         final JFrame app = new JFrame("Quiz Application");
@@ -299,10 +280,8 @@ public class AppBuilder {
             this.viewManagerModel.navigate(this.homeView.getViewName());
         }
 
-        // MUST: create result feature before confirm submit
         this.addResultFeature();
 
-        // confirm submit depends on result controller
         this.addConfirmSubmitFeature(app);
 
         return app;

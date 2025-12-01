@@ -6,10 +6,10 @@ import java.util.List;
  * State object used by ConfirmViewModel and ConfirmView.
  */
 public class ConfirmState {
-    private final List<Integer> incompleteQuestionIndices; // zero-based
+    private final List<Integer> incompleteQuestionIndices;
     private final boolean allCompleted;
     private final String message;
-    private final String actionButtonText; // "Confirm Submit" or "Still Submit"
+    private final String actionButtonText;
 
     public ConfirmState(List<Integer> incompleteQuestionIndices, boolean allCompleted, String message, String actionButtonText) {
         this.incompleteQuestionIndices = incompleteQuestionIndices;

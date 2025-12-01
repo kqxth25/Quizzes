@@ -26,7 +26,6 @@ public class QuizState {
         this.correctAnswers = new int[totalQuestions];   // ★ 初始化正确答案数组
     }
 
-    // ========== 原有 getters / setters ==========
     public int getCurrentQuestionIndex() {
         return currentQuestionIndex;
     }
@@ -55,7 +54,6 @@ public class QuizState {
         this.options = options;
     }
 
-    // ========== 用户答案 ==========
     public int[] getSelectedAnswers() {
         return selectedAnswers;
     }
@@ -81,7 +79,6 @@ public class QuizState {
         return currentQuestionIndex > 0;
     }
 
-    // ========== ★ 新增：正确答案 ==========
     public void setCorrectAnswers(int[] correctAnswers) {
         this.correctAnswers = correctAnswers;
     }
