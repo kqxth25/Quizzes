@@ -15,6 +15,7 @@ public class ConfirmDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().add(content);
+        setMinimumSize(new Dimension(500, 250));
         pack();
         setResizable(false);
         setLocationRelativeTo(owner);
