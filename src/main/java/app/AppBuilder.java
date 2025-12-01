@@ -72,6 +72,10 @@ public class AppBuilder {
 
     private final ViewManager viewManager;
 
+    // ----------- CONFIRM SUBMIT FEATURE (created later) -----------
+    private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
+    private interface_adapter.confirm_submit.ConfirmController confirmController;
+    // -------------------------------------------------------------
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
@@ -85,9 +89,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginView() {
-        // create the ViewModel first
         this.creatorLoginViewModel = new CreatorLoginViewModel();
-        // pass the ViewModel into the CreatorLoginView so it can listen for updates
         this.creatorLoginView = new CreatorLoginView(this.viewManagerModel, this.creatorLoginViewModel);
         this.cardPanel.add(this.creatorLoginView, this.creatorLoginView.getViewName());
         return this;
@@ -151,20 +153,16 @@ public class AppBuilder {
     }
 
     public AppBuilder addCreatorLoginUseCase() {
-        // Presenter should be created with the CreatorLoginViewModel so it can update the view model
         CreatorLoginOutputBoundary presenter =
                 new CreatorLoginPresenter(this.viewManagerModel, this.creatorLoginViewModel);
-
         CreatorLoginInputBoundary interactor =
                 new CreatorLoginInteractor(presenter);
-
         CreatorLoginController controller =
                 new CreatorLoginController(interactor);
-
         this.creatorLoginView.setController(controller);
-
         return this;
     }
+
     public AppBuilder addQuizView() {
         QuizRepository_answer repository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
 
@@ -180,11 +178,41 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addSelectQuizUseCase(ListQuizzesDataAccessInterface externalQuizDao) {
-        this.quizDao = externalQuizDao;
-        return addSelectQuizUseCase();
-    }
+    // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
+    public AppBuilder addConfirmSubmitFeature(JFrame app) {
 
+        interface_adapter.confirm_submit.ConfirmState initialConfirmState =
+                new interface_adapter.confirm_submit.ConfirmState(
+                        java.util.Collections.emptyList(),
+                        false,
+                        "",
+                        "Confirm Submit"
+                );
+
+        this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialConfirmState);
+
+        interface_adapter.confirm_submit.ConfirmPresenter confirmPresenter =
+                new interface_adapter.confirm_submit.ConfirmPresenter(this.confirmVm);
+
+        use_case.quiz.QuizStateProvider provider =
+                new interface_adapter.quiz.QuizViewModelAdapter(this.quizViewModel);
+
+        use_case.confirm.ConfirmInteractor confirmInteractor =
+                new use_case.confirm.ConfirmInteractor(provider, confirmPresenter);
+
+        this.confirmController =
+                new interface_adapter.confirm_submit.ConfirmController(confirmInteractor);
+
+        this.quizController.setConfirmController(this.confirmController);
+
+        view.ConfirmDialog confirmDialog =
+                new view.ConfirmDialog(app, this.confirmVm, this.confirmController);
+
+        this.confirmController.setConfirmDialog(confirmDialog);
+
+        return this;
+    }
+    // -------------------------------------------------------------------------------------------
 
     public JFrame build() {
         final JFrame app = new JFrame("Quiz Application");
@@ -196,6 +224,10 @@ public class AppBuilder {
         if (this.homeView != null) {
             this.viewManagerModel.navigate(this.homeView.getViewName());
         }
+
+        // important: build confirm submit feature after quiz is created
+        this.addConfirmSubmitFeature(app);
+
         return app;
     }
 }
