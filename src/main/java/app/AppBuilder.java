@@ -192,7 +192,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addResultFeature() {
-        // (1) Result VM / presenter / interactor / controller (existing)
+
+        // (1) Result VM / presenter / interactor / controller
         this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
         interface_adapter.result.ResultPresenter resultPresenter =
                 new interface_adapter.result.ResultPresenter(this.resultVm);
@@ -200,33 +201,53 @@ public class AppBuilder {
                 new use_case.result.ResultInteractor(this.quizAnswerRepository, resultPresenter, this.quizViewModel);
         this.resultController = new interface_adapter.result.ResultController(resultInteractor);
 
-        // (2) ResultView (create and add)
-        view.ResultView resultView = new view.ResultView(resultVm, this.viewManagerModel);
+        // ---------------------------
+        // Share Result wiring first (we need shareController for ResultView)
+        // ---------------------------
+        interface_adapter.share_result.ShareResultViewModel shareVm =
+                new interface_adapter.share_result.ShareResultViewModel();
+
+        interface_adapter.share_result.ShareResultController shareController =
+                new interface_adapter.share_result.ShareResultController(
+                        shareVm,
+                        this.loginViewModel,
+                        this.selectQuizViewModel,
+                        this.resultVm
+                );
+
+        view.ShareResultView shareView = new view.ShareResultView(shareVm);
+        this.cardPanel.add(shareView, "share result");
+
+        // ---------------------------
+        // Now create ResultView with 3 parameters
+        // ---------------------------
+        view.ResultView resultView =
+                new view.ResultView(this.resultVm, this.viewManagerModel, shareController);
+
         this.cardPanel.add(resultView, "resultView");
 
         // ---------------------------
-        // Now create Detail (detail view + wiring)
+        // Detail wiring
         // ---------------------------
-        DetailViewModel detailVm = new DetailViewModel(new interface_adapter.result_detail.DetailState(new String[0], new String[0][], new int[0], new int[0]));
+        DetailViewModel detailVm = new DetailViewModel(
+                new interface_adapter.result_detail.DetailState(new String[0], new String[0][], new int[0], new int[0])
+        );
         DetailPresenter detailPresenter = new DetailPresenter(detailVm);
         DetailInteractor detailInteractor = new DetailInteractor(this.quizAnswerRepository, detailPresenter);
         DetailController detailController = new DetailController(detailInteractor);
 
-        // DetailView (UI) and registration in cardPanel
         view.DetailView detailView = new view.DetailView(detailVm, this.viewManagerModel);
         this.cardPanel.add(detailView, "detailView");
 
-        // Inject detailController into resultView so clicking "View Detail" triggers load + navigate
-        // NOTE: requires ResultView to expose setDetailController(DetailController)
-        try {
-            resultView.setDetailController(detailController);
-        } catch (NoSuchMethodError | UnsupportedOperationException ex) {
-            // if your ResultView does not have setter, user must add it.
-            System.err.println("ResultView.setDetailController not found. Please add the setter to ResultView.");
-        }
+        // inject detail controller (your ResultView must have setDetailController)
+        resultView.setDetailController(detailController);
+
+        // inject share controller (your ResultView must have setShareController)
+        resultView.setShareController(shareController);
 
         return this;
     }
+
 
     // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
     public AppBuilder addConfirmSubmitFeature(JFrame app) {

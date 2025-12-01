@@ -1,10 +1,12 @@
 package view;
 
+import interface_adapter.result.ResultController;
 import interface_adapter.result.ResultViewModel;
 import interface_adapter.result.ResultState;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.result_detail.DetailController;
+import interface_adapter.share_result.ShareResultController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +18,10 @@ public class ResultView extends JPanel implements PropertyChangeListener {
     private final ResultViewModel viewModel;
     private final ViewManagerModel viewManagerModel;
     private DetailController detailController;
+    private interface_adapter.share_result.ShareResultController shareController;
 
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
+    private final ShareResultController shareResultcontroller;
 
     // New buttons
     private JButton shareBtn;
@@ -32,9 +36,10 @@ public class ResultView extends JPanel implements PropertyChangeListener {
     private static final Color SECONDARY = new Color(148, 163, 184);
     private static final Color SECONDARY_HOVER = new Color(148, 163, 184).brighter();
 
-    public ResultView(ResultViewModel viewModel, ViewManagerModel viewManagerModel) {
+    public ResultView(ResultViewModel viewModel, ViewManagerModel viewManagerModel, ShareResultController shareResultcontroller) {
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
+        this.shareResultcontroller = shareResultcontroller;
 
         this.viewModel.addPropertyChangeListener(this);
 
@@ -63,6 +68,11 @@ public class ResultView extends JPanel implements PropertyChangeListener {
         detailBtn = createSecondaryButton("View Detail");
         backBtn = createSecondaryButton("Back to Home");
 
+        shareBtn.addActionListener(e -> {
+            shareResultcontroller.loadShareData();
+            viewManagerModel.navigate("share result");
+        });
+
         backBtn.addActionListener(e -> viewManagerModel.navigate("home"));
 
         buttons.add(shareBtn);
@@ -78,6 +88,11 @@ public class ResultView extends JPanel implements PropertyChangeListener {
 
         updateFromState(viewModel.getState());
     }
+
+    public void setShareController(interface_adapter.share_result.ShareResultController controller) {
+        this.shareController = controller;
+    }
+
     public void setDetailController(DetailController controller) {
         this.detailController = controller;
 

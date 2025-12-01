@@ -22,13 +22,20 @@ public class LoginPresenter implements LoginOutputBoundary {
     @Override
     public void prepareSuccessView(LoginOutputData out) {
 
+        // 1. 存用户信息到 ViewManagerModel（你本来有）
         viewManagerModel.setCurrentUser(out.getUsername());
 
-        loginViewModel.setState(new LoginState());
+        // 2. 更新 LoginViewModel 的 state，写入 username
+        LoginState s = new LoginState();
+        s.setUsername(out.getUsername());
+        loginViewModel.setState(s);
+
         loginViewModel.firePropertyChange();
 
+        // 3. 跳转
         viewManagerModel.navigate(selectQuizViewModel.getViewName());
     }
+
 
     @Override
     public void prepareFailView(String error) {
