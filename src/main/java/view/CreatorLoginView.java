@@ -107,14 +107,18 @@ public class CreatorLoginView extends JPanel {
         backBtn.addActionListener(e -> viewManagerModel.navigate("home"));
     }
 
-
+    /**
+     * Listen for success or failure from the presenter via the view model.
+     */
     private void setupViewModelListener() {
         viewModel.addPropertyChangeListener(evt -> {
+            // SUCCESS → navigate to manage screen
             if (viewModel.isLoginSuccess()) {
                 viewManagerModel.navigate("manage");
                 return;
             }
 
+            // FAILURE → show the popup
             if (viewModel.getErrorMessage() != null) {
                 JOptionPane.showMessageDialog(
                         this,
