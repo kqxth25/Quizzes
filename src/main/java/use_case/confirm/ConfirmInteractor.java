@@ -34,10 +34,14 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
             }
         }
 
+        // ⬇⬇⬇ 在这里忽略 Q10（index = 9）未完成 ⬇⬇⬇
+        incomplete.remove(Integer.valueOf(9));
+
         boolean allCompleted = incomplete.isEmpty();
         ConfirmResponseModel response = new ConfirmResponseModel(incomplete, allCompleted);
         presenter.presentConfirmation(response);
     }
+
 
     @Override
     public void forceSubmit() {

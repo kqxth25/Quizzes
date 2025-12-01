@@ -67,6 +67,7 @@ public class AppBuilder {
     private QuizViewModel quizViewModel;
     private QuizController quizController;
     private QuizView quizView;
+    private use_case.quiz.QuizRepository_answer quizAnswerRepository;
 
     private ManageQuizView manageQuizView;
 
@@ -164,11 +165,11 @@ public class AppBuilder {
     }
 
     public AppBuilder addQuizView() {
-        QuizRepository_answer repository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
+        this.quizAnswerRepository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
 
         this.quizViewModel = new QuizViewModel(new QuizState(10));
         QuizPresenter presenter = new QuizPresenter(this.quizViewModel);
-        AnswerQuizInputBoundary interactor = new AnswerQuizInteractor(presenter, repository);
+        AnswerQuizInputBoundary interactor = new AnswerQuizInteractor(presenter, this.quizAnswerRepository);
         this.quizController = new QuizController(interactor);
 
         this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
@@ -195,7 +196,7 @@ public class AppBuilder {
                 new interface_adapter.confirm_submit.ConfirmPresenter(this.confirmVm);
 
         use_case.quiz.QuizStateProvider provider =
-                new interface_adapter.quiz.QuizViewModelAdapter(this.quizViewModel);
+                new interface_adapter.quiz.QuizStateProviderImpl(this.quizViewModel, this.quizAnswerRepository);
 
         use_case.confirm.ConfirmInteractor confirmInteractor =
                 new use_case.confirm.ConfirmInteractor(provider, confirmPresenter);
