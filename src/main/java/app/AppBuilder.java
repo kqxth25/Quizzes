@@ -40,6 +40,12 @@ import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
 
+// 新增 detail imports (interface_adapter + use_case package names)
+import interface_adapter.result_detail.DetailViewModel;
+import interface_adapter.result_detail.DetailPresenter;
+import interface_adapter.result_detail.DetailController;
+import use_case.result_detail.DetailInteractor;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -78,40 +84,10 @@ public class AppBuilder {
     private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
     private interface_adapter.confirm_submit.ConfirmController confirmController;
     // -------------------------------------------------------------
-// ================= RESULT FEATURE =================
+
+    // ================= RESULT FEATURE =================
     private interface_adapter.result.ResultViewModel resultVm;
     private interface_adapter.result.ResultController resultController;
-
-    public AppBuilder addResultFeature() {
-
-        // (1) view model
-        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
-
-        // (2) callback: navigate to "resultView"
-        Runnable showResult = () -> {
-            this.viewManagerModel.navigate("resultView");
-        };
-
-        // (3) presenter
-        interface_adapter.result.ResultPresenter presenter =
-                new interface_adapter.result.ResultPresenter(this.resultVm);
-
-        // (4) interactor
-        use_case.result.ResultInteractor interactor =
-                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter, this.quizViewModel);
-
-        // (5) controller
-        this.resultController =
-                new interface_adapter.result.ResultController(interactor);
-
-        // (6) Result View (card layout)
-        view.ResultView resultView =
-                new view.ResultView(resultVm, this.viewManagerModel);
-
-        this.cardPanel.add(resultView, "resultView");
-
-        return this;
-    }
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
@@ -200,6 +176,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addQuizView() {
+        // quizAnswerRepository is the adapter over the imported repository
         this.quizAnswerRepository = new use_case.quiz.ImportedQuizRepositoryAdapter(this.manageQuizRepository);
 
         this.quizViewModel = new QuizViewModel(new QuizState(10));
@@ -210,6 +187,43 @@ public class AppBuilder {
         this.quizView = new QuizView(this.quizViewModel, this.viewManagerModel);
         this.quizView.setController(this.quizController);
         this.cardPanel.add(this.quizView, "quiz");
+
+        return this;
+    }
+
+    public AppBuilder addResultFeature() {
+        // (1) Result VM / presenter / interactor / controller (existing)
+        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
+        interface_adapter.result.ResultPresenter resultPresenter =
+                new interface_adapter.result.ResultPresenter(this.resultVm);
+        use_case.result.ResultInteractor resultInteractor =
+                new use_case.result.ResultInteractor(this.quizAnswerRepository, resultPresenter, this.quizViewModel);
+        this.resultController = new interface_adapter.result.ResultController(resultInteractor);
+
+        // (2) ResultView (create and add)
+        view.ResultView resultView = new view.ResultView(resultVm, this.viewManagerModel);
+        this.cardPanel.add(resultView, "resultView");
+
+        // ---------------------------
+        // Now create Detail (detail view + wiring)
+        // ---------------------------
+        DetailViewModel detailVm = new DetailViewModel(new interface_adapter.result_detail.DetailState(new String[0], new String[0][], new int[0], new int[0]));
+        DetailPresenter detailPresenter = new DetailPresenter(detailVm);
+        DetailInteractor detailInteractor = new DetailInteractor(this.quizAnswerRepository, detailPresenter);
+        DetailController detailController = new DetailController(detailInteractor);
+
+        // DetailView (UI) and registration in cardPanel
+        view.DetailView detailView = new view.DetailView(detailVm, this.viewManagerModel);
+        this.cardPanel.add(detailView, "detailView");
+
+        // Inject detailController into resultView so clicking "View Detail" triggers load + navigate
+        // NOTE: requires ResultView to expose setDetailController(DetailController)
+        try {
+            resultView.setDetailController(detailController);
+        } catch (NoSuchMethodError | UnsupportedOperationException ex) {
+            // if your ResultView does not have setter, user must add it.
+            System.err.println("ResultView.setDetailController not found. Please add the setter to ResultView.");
+        }
 
         return this;
     }

@@ -4,6 +4,7 @@ import interface_adapter.result.ResultViewModel;
 import interface_adapter.result.ResultState;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.result_detail.DetailController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,7 @@ public class ResultView extends JPanel implements PropertyChangeListener {
 
     private final ResultViewModel viewModel;
     private final ViewManagerModel viewManagerModel;
+    private DetailController detailController;
 
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
 
@@ -76,7 +78,29 @@ public class ResultView extends JPanel implements PropertyChangeListener {
 
         updateFromState(viewModel.getState());
     }
+    public void setDetailController(DetailController controller) {
+        this.detailController = controller;
 
+        // remove previous listeners (optional), then add new one
+        // make sure detailBtn was created in constructor before this setter is called
+        if (detailBtn != null) {
+            // clear existing listeners to avoid duplicate actions
+            for (java.awt.event.ActionListener al : detailBtn.getActionListeners()) {
+                detailBtn.removeActionListener(al);
+            }
+
+            detailBtn.addActionListener(e -> {
+                if (this.detailController != null) {
+                    // ask controller to prepare/present detail data
+                    this.detailController.showDetail();
+                }
+                // navigate to detail view (AppBuilder has already added detailView to cardPanel)
+                this.viewManagerModel.navigate("detailView");
+            });
+        } else {
+            throw new UnsupportedOperationException("detailBtn must be initialized before setDetailController is called");
+        }
+    }
     private void updateFromState(ResultState state) {
         if (state == null) {
             scoreLabel.setText("No result");
