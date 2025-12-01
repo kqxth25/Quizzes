@@ -45,6 +45,11 @@ import interface_adapter.result_detail.DetailViewModel;
 import interface_adapter.result_detail.DetailPresenter;
 import interface_adapter.result_detail.DetailController;
 import use_case.result_detail.DetailInteractor;
+import interface_adapter.history.HistoryController;
+import use_case.history.HistoryInputBoundary;
+import use_case.history.HistoryInteractor;
+import use_case.history.HistoryOutputBoundary;
+import interface_adapter.history.HistoryPresenter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,6 +81,7 @@ public class AppBuilder {
     private QuizView quizView;
     private use_case.quiz.QuizRepository_answer quizAnswerRepository;
 
+    private HistoryView historyView;
     private ManageQuizView manageQuizView;
 
     private final ViewManager viewManager;
@@ -88,10 +94,13 @@ public class AppBuilder {
     // ================= RESULT FEATURE =================
     private interface_adapter.result.ResultViewModel resultVm;
     private interface_adapter.result.ResultController resultController;
+    private HistoryController historyController;
 
     public AppBuilder() {
         this.cardPanel.setLayout(this.cardLayout);
         this.viewManager = new ViewManager(this.cardPanel, this.cardLayout, this.viewManagerModel);
+
+        addHistoryUseCase();
     }
 
     public AppBuilder addHomeView() {
@@ -127,7 +136,8 @@ public class AppBuilder {
                 this.selectQuizViewModel,
                 this.viewManagerModel,
                 this.quizViewModel,
-                this.quizController
+                this.quizController,
+                this.historyController
         );
         this.cardPanel.add(this.selectQuizView, this.selectQuizView.getViewName());
         return this;
@@ -136,6 +146,12 @@ public class AppBuilder {
     public AppBuilder addManageQuizView() {
         this.manageQuizView = new ManageQuizView(this.viewManagerModel, this.manageQuizRepository);
         this.cardPanel.add(this.manageQuizView, this.manageQuizView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addHistoryView() {
+        this.historyView = new HistoryView(this.viewManagerModel);
+        this.cardPanel.add(this.historyView, this.historyView.getViewName());
         return this;
     }
 
@@ -248,6 +264,15 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addHistoryUseCase() {
+        HistoryOutputBoundary presenter = new HistoryPresenter(this.viewManagerModel);
+
+        HistoryInputBoundary interactor = new HistoryInteractor(presenter);
+
+        this.historyController = new HistoryController(interactor);
+
+        return this;
+    }
 
     // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
     public AppBuilder addConfirmSubmitFeature(JFrame app) {
@@ -307,5 +332,4 @@ public class AppBuilder {
 
         return app;
     }
-
 }
