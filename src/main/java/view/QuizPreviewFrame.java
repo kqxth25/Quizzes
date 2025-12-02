@@ -48,7 +48,7 @@ public class QuizPreviewFrame extends JFrame {
         title.setForeground(TEXT_MAIN);
         inner.add(title, BorderLayout.NORTH);
 
-        JPanel info = new JPanel(new GridLayout(3, 2, 12, 12));
+        JPanel info = new JPanel(new GridLayout(4, 2, 12, 12));
         info.setOpaque(false);
 
         info.add(buildInfoLabel("Questions:"));
@@ -59,6 +59,9 @@ public class QuizPreviewFrame extends JFrame {
 
         info.add(buildInfoLabel("Difficulty:"));
         info.add(buildInfoValue(quiz.getDifficulty()));
+
+        info.add(buildInfoLabel("Type:"));
+        info.add(buildInfoValue(quiz.getType()));
 
         inner.add(info, BorderLayout.WEST);
 
