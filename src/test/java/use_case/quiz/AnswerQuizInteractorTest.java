@@ -1,6 +1,13 @@
 package use_case.quiz;
 
+import entity.Question;
+import entity.Quiz;
 import org.junit.jupiter.api.Test;
+import use_case.quiz.*;
+import use_case.quizimport.QuizRepository_import;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,9 +24,7 @@ class AnswerQuizInteractorTest {
             {"A2", "B2", "C2", "D2"},
             {"A3", "B3", "C3", "D3"}
     };
-
     private static final int[] TEST_CORRECT_ANSWERS = {0, 1, 2};
-
 
     @Test
     void submitAnswer_FirstQuestion_Success() {
@@ -409,4 +414,98 @@ class AnswerQuizInteractorTest {
 
         assertDoesNotThrow(() -> interactor.loadQuiz("Test Quiz"));
     }
+
+
+    @Test
+    void testAdapterWithNullQuiz() {
+        QuizRepository_import mockRepo = createMockImportRepository(null);
+        ImportedQuizRepositoryAdapter adapter = new ImportedQuizRepositoryAdapter(mockRepo);
+
+        adapter.loadQuiz("Nonexistent");
+
+        assertEquals(0, adapter.getQuestionCount());
+        assertEquals(0, adapter.getQuestions().length);
+        assertEquals(0, adapter.getOptions().length);
+        assertEquals(0, adapter.getCorrectAnswers().length);
+    }
+
+    @Test
+    void testAdapterLoadsQuiz() {
+        Question q1 = new Question("What is Java?", "A language",
+                Arrays.asList("A drink", "A country"));
+        Question q2 = new Question("What is Python?", "A snake",
+                Arrays.asList("A language", "A tool"));
+
+        Quiz quiz = new Quiz("Programming Quiz", 2, "Tech", "easy", "multiple",
+                Arrays.asList(q1, q2));
+        QuizRepository_import mockRepo = createMockImportRepository(quiz);
+        ImportedQuizRepositoryAdapter adapter = new ImportedQuizRepositoryAdapter(mockRepo);
+
+        adapter.loadQuiz("Programming Quiz");
+
+        assertEquals(2, adapter.getQuestionCount());
+        assertEquals("What is Java?", adapter.getQuestions()[0][0]);
+        assertEquals("What is Python?", adapter.getQuestions()[1][0]);
+        assertEquals(3, adapter.getOptions()[0].length);
+        assertEquals("A language", adapter.getOptions()[0][0]);
+        assertEquals(0, adapter.getCorrectAnswers()[0]);
+    }
+
+    @Test
+    void testAdapterWithEmptyQuiz() {
+        Quiz emptyQuiz = new Quiz("Empty", 0, "Test", "easy", "multiple", Arrays.asList());
+        QuizRepository_import mockRepo = createMockImportRepository(emptyQuiz);
+        ImportedQuizRepositoryAdapter adapter = new ImportedQuizRepositoryAdapter(mockRepo);
+
+        adapter.loadQuiz("Empty");
+
+        assertEquals(0, adapter.getQuestionCount());
+    }
+
+
+    @Test
+    void testLocalRepositoryStoresData() {
+        String[][] questions = {{"Q1"}, {"Q2"}};
+        String[][] options = {{"A", "B", "C"}, {"D", "E", "F"}};
+        int[] correctAnswers = {0, 1};
+
+        LocalQuizRepositoryAnswer repo = new LocalQuizRepositoryAnswer(questions, options, correctAnswers);
+
+        assertArrayEquals(questions, repo.getQuestions());
+        assertArrayEquals(options, repo.getOptions());
+        assertArrayEquals(correctAnswers, repo.getCorrectAnswers());
+    }
+
+    @Test
+    void testLocalRepositoryWithEmptyData() {
+        String[][] empty = new String[0][0];
+        int[] emptyAnswers = new int[0];
+
+        LocalQuizRepositoryAnswer repo = new LocalQuizRepositoryAnswer(empty, empty, emptyAnswers);
+
+        assertEquals(0, repo.getQuestions().length);
+        assertEquals(0, repo.getOptions().length);
+        assertEquals(0, repo.getCorrectAnswers().length);
+    }
+
+    private QuizRepository_import createMockImportRepository(Quiz quiz) {
+        return new QuizRepository_import() {
+            @Override
+            public void save(Quiz quiz) {}
+
+            @Override
+            public List<Quiz> getAll() {
+                return quiz != null ? Arrays.asList(quiz) : Arrays.asList();
+            }
+
+            @Override
+            public Quiz getByName(String name) {
+                return quiz;
+            }
+
+            @Override
+            public void delete(String name) {}
+        };
+    }
 }
+
