@@ -11,14 +11,15 @@ public class Main {
                         .addHomeView()
                         .addLoginView()
                         .addSignupView()
-                        .addSelectQuizView()
                         .addQuizView()
-                        .addCreatorLoginView()
+                        .addSelectQuizView()
                         .addManageQuizView()
+                        .addCreatorLoginView()
                         .addSignupUseCase()
                         .addLoginUseCase()
                         .addSelectQuizUseCase()
                         .addCreatorLoginUseCase()
+                        .addHistoryView()
                         .build();
                 app.setVisible(true);
             }
