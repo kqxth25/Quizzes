@@ -28,16 +28,11 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
         String[][] questions = repository.getQuestions();
         String[][] options = repository.getOptions();
 
-        if (questions == null || questions.length == 0) {
-            presenter.presentNavigationWarning("No questions loaded");
-            return;
-        }
-
         int currentIndex = inputData.getQuestionIndex();
         int nextIndex = Math.min(currentIndex + 1, questions.length - 1);
 
         String questionText = questions[nextIndex][0];
-        String[] opts = options == null || options.length == 0 ? new String[0] : options[nextIndex];
+        String[] opts = options[nextIndex];
 
         AnswerQuizOutputData outputData = new AnswerQuizOutputData(
                 currentIndex,
@@ -61,11 +56,6 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
         String[][] questions = repository.getQuestions();
         String[][] options = repository.getOptions();
 
-        if (questions == null || questions.length == 0) {
-            presenter.presentNavigationWarning("No questions loaded");
-            return;
-        }
-
         int currentIndex = inputData.getQuestionIndex();
 
         if (currentIndex >= questions.length - 1) {
@@ -75,7 +65,7 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
 
         int nextIndex = currentIndex + 1;
         String questionText = questions[nextIndex][0];
-        String[] opts = options == null || options.length == 0 ? new String[0] : options[nextIndex];
+        String[] opts = options[nextIndex];
 
         AnswerQuizOutputData outputData = new AnswerQuizOutputData(
                 currentIndex,
@@ -99,11 +89,6 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
         String[][] questions = repository.getQuestions();
         String[][] options = repository.getOptions();
 
-        if (questions == null || questions.length == 0) {
-            presenter.presentNavigationWarning("No questions loaded");
-            return;
-        }
-
         int currentIndex = inputData.getQuestionIndex();
 
         if (currentIndex <= 0) {
@@ -113,7 +98,7 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
 
         int prevIndex = currentIndex - 1;
         String questionText = questions[prevIndex][0];
-        String[] opts = options == null || options.length == 0 ? new String[0] : options[prevIndex];
+        String[] opts = options[prevIndex];
 
         AnswerQuizOutputData outputData = new AnswerQuizOutputData(
                 currentIndex,
@@ -127,6 +112,8 @@ public class AnswerQuizInteractor implements AnswerQuizInputBoundary {
     }
 
     public void loadQuiz(String quizName) {
-        repository.loadQuiz(quizName);
+        if (repository instanceof ImportedQuizRepositoryAdapter) {
+            ((ImportedQuizRepositoryAdapter) repository).loadQuiz(quizName);
+        }
     }
 }

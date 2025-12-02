@@ -29,14 +29,6 @@ class AnswerQuizInteractorTest {
     @Test
     void submitAnswer_FirstQuestion_Success() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -50,16 +42,6 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
             }
         };
 
@@ -91,7 +73,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(0, 1);
         interactor.submitAnswer(inputData);
     }
@@ -99,14 +80,6 @@ class AnswerQuizInteractorTest {
     @Test
     void submitAnswer_LastQuestion_DoesNotExceedBounds() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -120,16 +93,6 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
             }
         };
 
@@ -159,7 +122,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(2, 3);
         interactor.submitAnswer(inputData);
     }
@@ -168,24 +130,6 @@ class AnswerQuizInteractorTest {
     @Test
     void next_FromFirstToSecond_Success() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -230,7 +174,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(0, 1);
         interactor.next(inputData);
     }
@@ -238,24 +181,6 @@ class AnswerQuizInteractorTest {
     @Test
     void next_AlreadyAtLastQuestion_ShowsWarning() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -295,7 +220,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(2, 0);
         interactor.next(inputData);
     }
@@ -304,24 +228,6 @@ class AnswerQuizInteractorTest {
     @Test
     void previous_FromSecondToFirst_Success() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -366,7 +272,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(1, 2);
         interactor.previous(inputData);
     }
@@ -374,24 +279,6 @@ class AnswerQuizInteractorTest {
     @Test
     void previous_AlreadyAtFirstQuestion_ShowsWarning() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -431,7 +318,6 @@ class AnswerQuizInteractorTest {
         };
 
         AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
-        interactor.loadQuiz("Test Quiz");
         AnswerQuizInputData inputData = new AnswerQuizInputData(0, 0);
         interactor.previous(inputData);
     }
@@ -490,24 +376,6 @@ class AnswerQuizInteractorTest {
     @Test
     void loadQuiz_WithNonAdapterRepository_DoesNotThrowException() {
         QuizRepository_answer repository = new QuizRepository_answer() {
-
-            private int[] saved = new int[0];
-
-            @Override
-            public void loadQuiz(String quizName) {
-                saved = new int[TEST_QUESTIONS.length];
-            }
-
-            @Override
-            public void saveAnswer(int index, int selectedOption) {
-                saved[index] = selectedOption;
-            }
-
-            @Override
-            public int[] getSavedAnswers() {
-                return saved;
-            }
-
             @Override
             public String[][] getQuestions() {
                 return TEST_QUESTIONS;
@@ -640,4 +508,3 @@ class AnswerQuizInteractorTest {
         };
     }
 }
-
