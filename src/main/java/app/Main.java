@@ -13,12 +13,13 @@ public class Main {
                         .addSignupView()
                         .addQuizView()
                         .addSelectQuizView()
-                        .addCreatorLoginView()
                         .addManageQuizView()
+                        .addCreatorLoginView()
                         .addSignupUseCase()
                         .addLoginUseCase()
                         .addSelectQuizUseCase()
                         .addCreatorLoginUseCase()
+                        .addHistoryView()
                         .build();
                 app.setVisible(true);
             }
