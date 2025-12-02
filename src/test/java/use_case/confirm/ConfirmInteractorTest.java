@@ -82,6 +82,10 @@ class ConfirmSubmitTest {
         assertTrue(incomplete.contains(1));
 
         assertEquals(9, incomplete.size());
+
+        boolean allCompleted = presenter.receivedResponse.isAllCompleted();
+        assertFalse(allCompleted);
+
     }
 
     @Test
