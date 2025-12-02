@@ -287,7 +287,6 @@ public class AppBuilder {
         return this;
     }
 
-    // -------------------------------------------------------------------------------------------
     public AppBuilder addHistoryUseCase() {
         HistoryOutputBoundary presenter = new HistoryPresenter(this.viewManagerModel);
 
