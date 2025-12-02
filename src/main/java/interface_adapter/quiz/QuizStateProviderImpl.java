@@ -26,7 +26,7 @@ public class QuizStateProviderImpl implements QuizStateProvider {
         if (saved != null) {
             int total = Math.min(saved.length, state.getTotalQuestions());
             for (int i = 0; i < total; i++) {
-                if (saved[i] >= 0) { // ← 关键修复！
+                if (saved[i] >= 0) {
                     state.setAnswer(i, saved[i]);
                 }
             }

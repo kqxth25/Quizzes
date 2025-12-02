@@ -8,6 +8,7 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.result.ResultState;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -37,6 +38,11 @@ import interface_adapter.quiz.QuizState;
 import use_case.quiz.QuizRepository_answer;
 import use_case.quiz.AnswerQuizInteractor;
 import use_case.quiz.AnswerQuizInputBoundary;
+
+import interface_adapter.result_detail.DetailViewModel;
+import interface_adapter.result_detail.DetailPresenter;
+import interface_adapter.result_detail.DetailController;
+import use_case.result_detail.DetailInteractor;
 
 import interface_adapter.history.HistoryController;
 import use_case.history.HistoryInputBoundary;
@@ -79,44 +85,15 @@ public class AppBuilder {
 
     private final ViewManager viewManager;
 
-    // ----------- CONFIRM SUBMIT FEATURE (created later) -----------
     private interface_adapter.confirm_submit.ConfirmViewModel confirmVm;
     private interface_adapter.confirm_submit.ConfirmController confirmController;
-    // -------------------------------------------------------------
-// ================= RESULT FEATURE =================
+
     private interface_adapter.result.ResultViewModel resultVm;
     private interface_adapter.result.ResultController resultController;
 
-    public AppBuilder addResultFeature() {
 
-        // (1) view model
-        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
 
-        // (2) callback: navigate to "resultView"
-        Runnable showResult = () -> {
-            this.viewManagerModel.navigate("resultView");
-        };
 
-        // (3) presenter
-        interface_adapter.result.ResultPresenter presenter =
-                new interface_adapter.result.ResultPresenter(this.resultVm, showResult);
-
-        // (4) interactor
-        use_case.result.ResultInteractor interactor =
-                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter);
-
-        // (5) controller
-        this.resultController =
-                new interface_adapter.result.ResultController(interactor);
-
-        // (6) Result View (card layout)
-        view.ResultView resultView =
-                new view.ResultView(resultVm, this.viewManagerModel);
-
-        this.cardPanel.add(resultView, "resultView");
-
-        return this;
-    }
     private HistoryController historyController;
 
     public AppBuilder() {
@@ -229,7 +206,52 @@ public class AppBuilder {
         return this;
     }
 
-    // ----------- NEW: confirm submit feature, created AFTER quizViewModel exists ----------------
+    public AppBuilder addResultFeature() {
+
+        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
+        interface_adapter.result.ResultPresenter resultPresenter =
+                new interface_adapter.result.ResultPresenter(this.resultVm);
+        use_case.result.ResultInteractor resultInteractor =
+                new use_case.result.ResultInteractor(this.quizAnswerRepository, resultPresenter, this.quizViewModel);
+        this.resultController = new interface_adapter.result.ResultController(resultInteractor);
+
+        interface_adapter.share_result.ShareResultViewModel shareVm =
+                new interface_adapter.share_result.ShareResultViewModel();
+
+        interface_adapter.share_result.ShareResultController shareController =
+                new interface_adapter.share_result.ShareResultController(
+                        shareVm,
+                        this.loginViewModel,
+                        this.selectQuizViewModel,
+                        this.resultVm
+                );
+
+        view.ShareResultView shareView = new view.ShareResultView(shareVm);
+        this.cardPanel.add(shareView, "share result");
+
+        view.ResultView resultView =
+                new view.ResultView(this.resultVm, this.viewManagerModel, shareController);
+
+        this.cardPanel.add(resultView, "resultView");
+
+        DetailViewModel detailVm = new DetailViewModel(
+                new interface_adapter.result_detail.DetailState(new String[0], new String[0][], new int[0], new int[0])
+        );
+        DetailPresenter detailPresenter = new DetailPresenter(detailVm);
+        DetailInteractor detailInteractor = new DetailInteractor(this.quizAnswerRepository, detailPresenter);
+        DetailController detailController = new DetailController(detailInteractor);
+
+        view.DetailView detailView = new view.DetailView(detailVm, this.viewManagerModel);
+        this.cardPanel.add(detailView, "detailView");
+
+        resultView.setDetailController(detailController);
+
+        resultView.setShareController(shareController);
+
+        return this;
+    }
+
+
     public AppBuilder addConfirmSubmitFeature(JFrame app) {
 
         interface_adapter.confirm_submit.ConfirmState initialState =
@@ -243,7 +265,7 @@ public class AppBuilder {
         this.confirmVm = new interface_adapter.confirm_submit.ConfirmViewModel(initialState);
 
         interface_adapter.confirm_submit.ConfirmPresenter confirmPresenter =
-                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm);
+                new interface_adapter.confirm_submit.ConfirmPresenter(this.viewManagerModel, this.confirmVm, this.resultVm);
 
         use_case.quiz.QuizStateProvider provider =
                 new interface_adapter.quiz.QuizStateProviderImpl(this.quizViewModel, this.quizAnswerRepository);
@@ -287,10 +309,8 @@ public class AppBuilder {
             this.viewManagerModel.navigate(this.homeView.getViewName());
         }
 
-        // MUST: create result feature before confirm submit
         this.addResultFeature();
 
-        // confirm submit depends on result controller
         this.addConfirmSubmitFeature(app);
 
         return app;

@@ -6,19 +6,15 @@ import use_case.result.ResultResponseModel;
 public class ResultPresenter implements ResultOutputBoundary {
 
     private final ResultViewModel viewModel;
-    private final Runnable showResultViewCallback;
 
-    public ResultPresenter(ResultViewModel viewModel, Runnable showResultViewCallback) {
-        this.viewModel = viewModel;
-        this.showResultViewCallback = showResultViewCallback;
+    public ResultPresenter(ResultViewModel vm) {
+        this.viewModel = vm;
     }
 
     @Override
     public void presentResult(ResultResponseModel response) {
-        ResultState state = new ResultState();
-        state.setScore(response.getScore());
-        viewModel.setState(state);
-
-        showResultViewCallback.run();  // navigate to result view
+        viewModel.setScore(response.getScore());
+        viewModel.setTotal(response.getTotal());
+        viewModel.firePropertyChanged();
     }
 }

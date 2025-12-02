@@ -7,16 +7,23 @@ public class QuizState {
     private int currentQuestionIndex;
     private String questionText;
     private String[] options;
-    private int[] selectedAnswers;
+
+    private int[] selectedAnswers;   // 用户选择
     private final int totalQuestions;
+
+    private int[] correctAnswers;    // ★ 新增：正确答案数组
 
     public QuizState(int totalQuestions) {
         this.totalQuestions = totalQuestions;
+
         this.selectedAnswers = new int[totalQuestions];
         Arrays.fill(this.selectedAnswers, -1);
+
         this.currentQuestionIndex = 0;
         this.questionText = "";
         this.options = new String[0];
+
+        this.correctAnswers = new int[totalQuestions];   // ★ 初始化正确答案数组
     }
 
     public int getCurrentQuestionIndex() {
@@ -70,5 +77,13 @@ public class QuizState {
 
     public boolean hasPrevious() {
         return currentQuestionIndex > 0;
+    }
+
+    public void setCorrectAnswers(int[] correctAnswers) {
+        this.correctAnswers = correctAnswers;
+    }
+
+    public int[] getCorrectAnswers() {
+        return correctAnswers;
     }
 }

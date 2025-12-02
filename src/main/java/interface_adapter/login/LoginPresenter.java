@@ -24,11 +24,15 @@ public class LoginPresenter implements LoginOutputBoundary {
 
         viewManagerModel.setCurrentUser(out.getUsername());
 
-        loginViewModel.setState(new LoginState());
+        LoginState s = new LoginState();
+        s.setUsername(out.getUsername());
+        loginViewModel.setState(s);
+
         loginViewModel.firePropertyChange();
 
         viewManagerModel.navigate(selectQuizViewModel.getViewName());
     }
+
 
     @Override
     public void prepareFailView(String error) {

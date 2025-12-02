@@ -26,7 +26,6 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
         int total = s.getTotalQuestions();
         List<Integer> incomplete = new ArrayList<>();
 
-        // 正常统计所有未完成题目
         for (int i = 0; i < total; i++) {
             int ans = s.getAnswer(i);
             if (ans < 0) {
@@ -34,7 +33,6 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
             }
         }
 
-        // 规则：不显示第10题（index = 9）
         incomplete.remove(Integer.valueOf(9));
 
         boolean allCompleted = incomplete.isEmpty();
@@ -46,12 +44,26 @@ public class ConfirmInteractor implements ConfirmInputBoundary {
 
     @Override
     public void forceSubmit() {
-        // 1. 告诉 Presenter 用户强制提交了（这步会把 dialog 按钮更新为 "Confirm Submit"）
-        ConfirmResponseModel response = new ConfirmResponseModel(new ArrayList<>(), true);
-        presenter.presentConfirmation(response);
 
-        // 2. 然后正式跳转到 result
+        QuizState s = stateProvider.getQuizState();
+        int total = s.getTotalQuestions();
+
+        int correct = 0;
+
+        int[] correctAnswers = s.getCorrectAnswers();
+
+        for (int i = 0; i < total; i++) {
+            if (s.getAnswer(i) == correctAnswers[i]) {
+                correct++;
+            }
+        }
+
+        double scorePct = (double) correct / total * 100.0;
+
+        presenter.showFinalScore(scorePct);
+
         presenter.showResult();
     }
+
 
 }

@@ -8,5 +8,7 @@ import interface_adapter.confirm_submit.ConfirmState;
 public interface ConfirmOutputBoundary {
     void presentConfirmation(ConfirmResponseModel response);
 
+    void showFinalScore(double scorePct);
+
     void showResult();
 }

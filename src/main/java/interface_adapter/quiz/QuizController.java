@@ -6,7 +6,6 @@ import use_case.quiz.AnswerQuizInteractor;
 
 public class QuizController {
     private final AnswerQuizInputBoundary submitAnswerUseCase;
-    // 新增：confirm controller
     private interface_adapter.confirm_submit.ConfirmController confirmController;
 
     public QuizController(AnswerQuizInputBoundary submitAnswerUseCase) {
@@ -34,7 +33,6 @@ public class QuizController {
         submitAnswerUseCase.previous(inputData);
     }
 
-    // ---------- 新增部分 ----------
     public void setConfirmController(interface_adapter.confirm_submit.ConfirmController confirmController) {
         this.confirmController = confirmController;
     }
