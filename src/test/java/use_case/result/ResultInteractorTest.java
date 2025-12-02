@@ -13,7 +13,6 @@ class ResultInteractorTest {
         );
         TestPresenter presenter = new TestPresenter();
 
-        // quizState is not used, so pass a fake ViewModel
         FakeQuizViewModel quizVM = new FakeQuizViewModel();
 
         ResultInteractor interactor =

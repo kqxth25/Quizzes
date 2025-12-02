@@ -22,8 +22,6 @@ class FakeRepository implements QuizRepository_answer {
         return correct;
     }
 
-    // ---- 不需要的接口方法全部 stub 掉 ----
-
     @Override
     public String[][] getQuestions() {
         return new String[0][];
@@ -36,11 +34,9 @@ class FakeRepository implements QuizRepository_answer {
 
     @Override
     public void saveAnswer(int index, int selectedOption) {
-        // do nothing
     }
 
     @Override
     public void loadQuiz(String quizName) {
-        // do nothing
     }
 }
