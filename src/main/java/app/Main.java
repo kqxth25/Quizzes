@@ -20,6 +20,7 @@ public class Main {
                         .addSelectQuizUseCase()
                         .addCreatorLoginUseCase()
                         .addHistoryView()
+                        .addHistoryView()
                         .build();
                 app.setVisible(true);
             }

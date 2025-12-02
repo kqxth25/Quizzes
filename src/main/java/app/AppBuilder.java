@@ -91,36 +91,9 @@ public class AppBuilder {
     private interface_adapter.result.ResultViewModel resultVm;
     private interface_adapter.result.ResultController resultController;
 
-    public AppBuilder addResultFeature() {
 
-        // (1) view model
-        this.resultVm = new interface_adapter.result.ResultViewModel(new interface_adapter.result.ResultState());
 
-        // (2) callback: navigate to "resultView"
-        Runnable showResult = () -> {
-            this.viewManagerModel.navigate("resultView");
-        };
 
-        // (3) presenter
-        interface_adapter.result.ResultPresenter presenter =
-                new interface_adapter.result.ResultPresenter(this.resultVm, showResult);
-
-        // (4) interactor
-        use_case.result.ResultInteractor interactor =
-                new use_case.result.ResultInteractor(this.quizAnswerRepository, presenter);
-
-        // (5) controller
-        this.resultController =
-                new interface_adapter.result.ResultController(interactor);
-
-        // (6) Result View (card layout)
-        view.ResultView resultView =
-                new view.ResultView(resultVm, this.viewManagerModel);
-
-        this.cardPanel.add(resultView, "resultView");
-
-        return this;
-    }
     private HistoryController historyController;
 
     public AppBuilder() {
