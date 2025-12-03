@@ -1,5 +1,4 @@
 package use_case.quiz;
-
 import entity.Question;
 import entity.Quiz;
 import org.junit.jupiter.api.Test;
@@ -42,6 +41,19 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
+            }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
             }
         };
 
@@ -94,6 +106,19 @@ class AnswerQuizInteractorTest {
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
             }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
+            }
         };
 
         AnswerQuizOutputBoundary presenter = new AnswerQuizOutputBoundary() {
@@ -143,6 +168,19 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
+            }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
             }
         };
 
@@ -195,6 +233,19 @@ class AnswerQuizInteractorTest {
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
             }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
+            }
         };
 
         AnswerQuizOutputBoundary presenter = new AnswerQuizOutputBoundary() {
@@ -241,6 +292,19 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
+            }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
             }
         };
 
@@ -292,6 +356,19 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
+            }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
             }
         };
 
@@ -389,6 +466,19 @@ class AnswerQuizInteractorTest {
             @Override
             public int[] getCorrectAnswers() {
                 return TEST_CORRECT_ANSWERS;
+            }
+
+            @Override
+            public void saveAnswer(int index, int selectedOption) {
+            }
+
+            @Override
+            public int[] getSavedAnswers() {
+                return new int[0];
+            }
+
+            @Override
+            public void loadQuiz(String quizName) {
             }
         };
 
@@ -488,6 +578,97 @@ class AnswerQuizInteractorTest {
         assertEquals(0, repo.getCorrectAnswers().length);
     }
 
+    @Test
+    void testLocalRepositorySaveAndGetAnswers() {
+        String[][] questions = {{"Q1"}, {"Q2"}, {"Q3"}};
+        String[][] options = {{"A", "B"}, {"C", "D"}, {"E", "F"}};
+        int[] correctAnswers = {0, 1, 0};
+
+        LocalQuizRepositoryAnswer repo = new LocalQuizRepositoryAnswer(questions, options, correctAnswers);
+
+        // Initially all answers should be -1
+        int[] savedAnswers = repo.getSavedAnswers();
+        assertEquals(3, savedAnswers.length);
+        assertEquals(-1, savedAnswers[0]);
+        assertEquals(-1, savedAnswers[1]);
+        assertEquals(-1, savedAnswers[2]);
+
+        // Save some answers
+        repo.saveAnswer(0, 1);
+        repo.saveAnswer(2, 0);
+
+        // Verify saved answers
+        savedAnswers = repo.getSavedAnswers();
+        assertEquals(1, savedAnswers[0]);
+        assertEquals(-1, savedAnswers[1]);
+        assertEquals(0, savedAnswers[2]);
+    }
+
+    @Test
+    void testLocalRepositoryLoadQuiz() {
+        String[][] questions = {{"Q1"}};
+        String[][] options = {{"A", "B"}};
+        int[] correctAnswers = {0};
+
+        LocalQuizRepositoryAnswer repo = new LocalQuizRepositoryAnswer(questions, options, correctAnswers);
+
+        // loadQuiz does nothing for LocalQuizRepositoryAnswer, just ensure no exception
+        assertDoesNotThrow(() -> repo.loadQuiz("Test"));
+    }
+
+    @Test
+    void testAdapterGetSavedAnswers() {
+        QuizRepository_import mockRepo = createMockImportRepository(null);
+        ImportedQuizRepositoryAdapter adapter = new ImportedQuizRepositoryAdapter(mockRepo);
+
+        int[] savedAnswers = adapter.getSavedAnswers();
+        assertEquals(0, savedAnswers.length);
+    }
+
+    @Test
+    void testAdapterSaveAnswer() {
+        QuizRepository_import mockRepo = createMockImportRepository(null);
+        ImportedQuizRepositoryAdapter adapter = new ImportedQuizRepositoryAdapter(mockRepo);
+
+        // saveAnswer does nothing for ImportedQuizRepositoryAdapter, just ensure no exception
+        assertDoesNotThrow(() -> adapter.saveAnswer(0, 1));
+    }
+
+    @Test
+    void testSaveAnswer() {
+        String[][] questions = {{"Q1"}, {"Q2"}};
+        String[][] options = {{"A", "B"}, {"C", "D"}};
+        int[] correctAnswers = {0, 1};
+
+        LocalQuizRepositoryAnswer repository = new LocalQuizRepositoryAnswer(questions, options, correctAnswers);
+
+        AnswerQuizOutputBoundary presenter = new AnswerQuizOutputBoundary() {
+            @Override
+            public void presentAnswer(AnswerQuizOutputData outputData) {
+            }
+
+            @Override
+            public void presentNextQuestion(AnswerQuizOutputData outputData) {
+            }
+
+            @Override
+            public void presentPreviousQuestion(AnswerQuizOutputData outputData) {
+            }
+
+            @Override
+            public void presentNavigationWarning(String message) {
+            }
+        };
+
+        AnswerQuizInteractor interactor = new AnswerQuizInteractor(presenter, repository);
+        AnswerQuizInputData inputData = new AnswerQuizInputData(1, 2);
+        interactor.saveAnswer(inputData);
+
+        // Verify answer was saved
+        int[] savedAnswers = repository.getSavedAnswers();
+        assertEquals(2, savedAnswers[1]);
+    }
+
     private QuizRepository_import createMockImportRepository(Quiz quiz) {
         return new QuizRepository_import() {
             @Override
@@ -508,4 +689,3 @@ class AnswerQuizInteractorTest {
         };
     }
 }
-
